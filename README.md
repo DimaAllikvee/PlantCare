@@ -40,16 +40,17 @@ We are using **Kanban** as our development model. Kanban is a simple and flexibl
 
 ### Why Kanban?
 
-- **Visual workflow** — We use a Kanban board (GitHub Projects) to track tasks across columns: To Do → In Progress → Done
-- **No fixed sprints** — Team members pick up tasks when they are ready, which fits our varying schedules
-- **Continuous delivery** — We can release updates as soon as features are completed and tested
-- **Easy to manage** — Minimal overhead, no need for sprint planning meetings
+- **Visual workflow** - We use a Kanban board (GitHub Projects) to track tasks across columns: To Do → In Progress → Done
+- **No fixed sprints** - Team members pick up tasks when they are ready, which fits our varying schedules
+- **Continuous delivery** - We can release updates as soon as features are completed and tested
+- **Easy to manage** - Minimal overhead, no need for sprint planning meetings
 
 ## Team Members
 
 | Name | GitHub Username |
 |------|----------------|
 | Dima Allikvee | [@DimaAllikvee](https://github.com/DimaAllikvee) |
+| Juri Allikvee | [@JuriAllikvee](https://github.com/JuriAllikvee) |
 
 ## How to Run
 
