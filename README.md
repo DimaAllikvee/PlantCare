@@ -4,9 +4,9 @@ PlantCare is an Android mobile application that helps users take care of their p
 
 ## Features
 
-- **User Authentication** — Login and Registration screens
-- **Plant Tracking** — Keep track of your plants and their care needs
-- **Reminders** — Get notified when it's time to water your plants
+- **User Authentication** - Login and Registration screens
+- **Plant Tracking** - Keep track of your plants and their care needs
+- **Reminders** - Get notified when it's time to water your plants
 
 ## Tech Stack
 
