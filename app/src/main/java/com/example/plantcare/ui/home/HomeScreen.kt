@@ -36,7 +36,9 @@ import com.example.plantcare.ui.theme.SurfaceLightGreen
 import com.example.plantcare.ui.theme.TextGray
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onNavigateToPlants: () -> Unit = {}
+) {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("Home", "Calendar", "Plants")
     val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist)
@@ -52,7 +54,12 @@ fun HomeScreen() {
                         icon = { Icon(icons[index], contentDescription = item) },
                         label = { Text(item, fontWeight = FontWeight.Medium) },
                         selected = selectedItem == index,
-                        onClick = { selectedItem = index },
+                        onClick = { 
+                            selectedItem = index
+                            if (index == 2) {
+                                onNavigateToPlants()
+                            }
+                        },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = PrimaryGreen,
                             selectedTextColor = PrimaryGreen,

@@ -5,6 +5,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.plantcare.ui.home.HomeScreen
+import com.example.plantcare.ui.myplants.MyPlantsScreen
+import com.example.plantcare.ui.newplant.AddNewPlantScreen
 import com.example.plantcare.ui.signup.SignUpScreen
 import com.example.plantcare.ui.login.LoginScreen
 
@@ -45,7 +47,32 @@ fun AppNavigation() {
         }
         
         composable(Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(
+                onNavigateToPlants = {
+                    navController.navigate(Screen.MyPlants.route)
+                }
+            )
+        }
+        
+        composable(Screen.MyPlants.route) {
+            MyPlantsScreen(
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onNavigateToAddNewPlant = {
+                    navController.navigate(Screen.AddNewPlant.route)
+                }
+            )
+        }
+        
+        composable(Screen.AddNewPlant.route) {
+            AddNewPlantScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
