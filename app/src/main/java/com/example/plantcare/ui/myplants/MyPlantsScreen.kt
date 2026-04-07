@@ -2,6 +2,7 @@ package com.example.plantcare.ui.myplants
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +16,9 @@ import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.plantcare.ui.myplants.PlantViewModel
+import com.example.plantcare.data.Plant
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,8 +38,17 @@ import com.example.plantcare.ui.theme.TextGray
 @Composable
 fun MyPlantsScreen(
     onNavigateToHome: () -> Unit = {},
-    onNavigateToAddNewPlant: () -> Unit = {}
+    onNavigateToAddNewPlant: () -> Unit = {},
+    onNavigateToPlantDetail: (String) -> Unit = {},
+    plantViewModel: PlantViewModel = viewModel()
 ) {
+    val plants by plantViewModel.plants.collectAsState()
+    
+    // Automatically fetch plants when screen is launched
+    LaunchedEffect(Unit) {
+        plantViewModel.fetchPlants()
+    }
+
     var selectedItem by remember { mutableStateOf(2) }
     var searchQuery by remember { mutableStateOf("") }
     val items = listOf("Home", "Calendar", "Plants")
@@ -131,13 +144,26 @@ fun MyPlantsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(6) { index ->
-                    PlantListCard(
-                        name = if (index % 2 == 0) "Monstera Deliciosa" else "Golden Pothos",
-                        lastWatered = "5 days ago",
-                        statusText = if (index % 2 == 0) "Watered" else "Due Today",
-                        isDue = index % 2 != 0
-                    )
+                if (plants.isEmpty()) {
+                    item {
+                        Text(
+                            text = "No plants added yet. Click + to add one!", 
+                            color = TextGray, 
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                } else {
+                    items(plants.size) { index ->
+                        val plant = plants[index]
+                        PlantListCard(
+                            name = plant.name,
+                            lastWatered = "Just now", // Placeholder logic
+                            statusText = "Watered", // Placeholder logic
+                            isDue = false, // Placeholder logic
+                            imageUrl = plant.imageUrl,
+                            onClick = { onNavigateToPlantDetail(plant.id) }
+                        )
+                    }
                 }
             }
         }
@@ -149,7 +175,9 @@ fun PlantListCard(
     name: String,
     lastWatered: String,
     statusText: String,
-    isDue: Boolean
+    isDue: Boolean,
+    imageUrl: String = "",
+    onClick: () -> Unit = {}
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -158,6 +186,7 @@ fun PlantListCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp)
+            .clickable { onClick() }
     ) {
         Row(
             modifier = Modifier
@@ -172,8 +201,10 @@ fun PlantListCard(
                     .clip(RoundedCornerShape(12.dp))
                     .background(SurfaceLightGreen)
             ) {
+                val imagePainter = painterResource(id = R.drawable.ficus_elastica)
+                
                 Image(
-                    painter = painterResource(id = R.drawable.ficus_elastica), // Placeholder image
+                    painter = imagePainter,
                     contentDescription = name,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
