@@ -6,13 +6,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.plantcare.ui.home.HomeScreen
 import com.example.plantcare.ui.myplants.MyPlantsScreen
+import com.example.plantcare.ui.myplants.PlantDetailScreen
+import com.example.plantcare.ui.myplants.PlantViewModel
 import com.example.plantcare.ui.newplant.AddNewPlantScreen
 import com.example.plantcare.ui.signup.SignUpScreen
 import com.example.plantcare.ui.login.LoginScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    // Shared ViewModel for plant management across the app flow
+    val sharedPlantViewModel: PlantViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -63,7 +68,11 @@ fun AppNavigation() {
                 },
                 onNavigateToAddNewPlant = {
                     navController.navigate(Screen.AddNewPlant.route)
-                }
+                },
+                onNavigateToPlantDetail = { plantId ->
+                    navController.navigate(Screen.PlantDetail.createRoute(plantId))
+                },
+                plantViewModel = sharedPlantViewModel
             )
         }
         
@@ -71,8 +80,22 @@ fun AppNavigation() {
             AddNewPlantScreen(
                 onNavigateBack = {
                     navController.popBackStack()
-                }
+                },
+                plantViewModel = sharedPlantViewModel
             )
+        }
+
+        composable(Screen.PlantDetail.route) { backStackEntry ->
+            val plantId = backStackEntry.arguments?.getString("plantId")
+            if (plantId != null) {
+                PlantDetailScreen(
+                    plantId = plantId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    plantViewModel = sharedPlantViewModel
+                )
+            }
         }
     }
 }

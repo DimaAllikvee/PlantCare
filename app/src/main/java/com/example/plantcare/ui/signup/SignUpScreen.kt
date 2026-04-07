@@ -11,6 +11,9 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.plantcare.ui.login.AuthViewModel
+import com.example.plantcare.ui.login.AuthState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,8 +34,10 @@ import com.example.plantcare.ui.theme.TextGray
 @Composable
 fun SignUpScreen(
     onLoginClick: () -> Unit = {},
-    onSignUpSuccess: () -> Unit = {}
+    onSignUpSuccess: () -> Unit = {},
+    authViewModel: AuthViewModel = viewModel()
 ) {
+    val authState by authViewModel.authState.collectAsState()
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -197,15 +202,43 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
+        // Authentication State Feedback
+        when (authState) {
+            is AuthState.Loading -> {
+                CircularProgressIndicator(color = PrimaryGreen, modifier = Modifier.padding(bottom = 16.dp))
+            }
+            is AuthState.Success -> {
+                LaunchedEffect(Unit) {
+                    onSignUpSuccess()
+                    authViewModel.resetState()
+                }
+            }
+            is AuthState.Error -> {
+                Text(
+                    text = (authState as AuthState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
+            else -> {}
+        }
+        
         // Sign Up Button
         Button(
-            onClick = { onSignUpSuccess() },
+            onClick = {
+                if (password == confirmPassword) {
+                    authViewModel.signUp(email, password, username)
+                } else {
+                    // Quick validation error just resetting states if needed, but normally handled in viewmodel or state
+                }
+            },
             shape = RoundedCornerShape(36.dp),
             colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
-                .height(85.dp)
+                .height(85.dp),
+            enabled = authState !is AuthState.Loading
         ) {
             Text(
                 text = "Sign Up",
