@@ -55,7 +55,8 @@ fun AppNavigation() {
             HomeScreen(
                 onNavigateToPlants = {
                     navController.navigate(Screen.MyPlants.route)
-                }
+                },
+                plantViewModel = sharedPlantViewModel
             )
         }
         

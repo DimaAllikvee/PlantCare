@@ -155,11 +155,32 @@ fun MyPlantsScreen(
                 } else {
                     items(plants.size) { index ->
                         val plant = plants[index]
+                        
+                        val diffMs = System.currentTimeMillis() - plant.lastWatered
+                        val daysSince = java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diffMs).toInt()
+                        
+                        val intervalMs: Int = try {
+                            val regex = "\\d+".toRegex()
+                            val match = regex.find(plant.wateringInterval)
+                            match?.value?.toInt() ?: 7
+                        } catch (e: Exception) {
+                            7
+                        }
+                        
+                        val isDue = daysSince >= intervalMs
+                        
+                        val lastWateredText = when (daysSince) {
+                            0 -> "Today"
+                            1 -> "Yesterday"
+                            else -> "$daysSince days ago"
+                        }
+                        val statusString = if (isDue) "Needs Water" else "Watered"
+
                         PlantListCard(
                             name = plant.name,
-                            lastWatered = "Just now", // Placeholder logic
-                            statusText = "Watered", // Placeholder logic
-                            isDue = false, // Placeholder logic
+                            lastWatered = lastWateredText,
+                            statusText = statusString,
+                            isDue = isDue,
                             imageUrl = plant.imageUrl,
                             onClick = { onNavigateToPlantDetail(plant.id) }
                         )

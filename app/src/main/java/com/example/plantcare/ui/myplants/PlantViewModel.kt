@@ -78,6 +78,17 @@ class PlantViewModel : ViewModel() {
             }
     }
 
+    fun markPlantWatered(plantId: String) {
+        db.collection("plants").document(plantId)
+            .update("lastWatered", System.currentTimeMillis())
+            .addOnSuccessListener {
+                fetchPlants() // refresh the list to reflect updated moisture
+            }
+            .addOnFailureListener { e ->
+                _plantState.value = PlantState.Error(e.message ?: "Error updating plant")
+            }
+    }
+
     fun fetchPlants() {
         val user = auth.currentUser ?: return
         
