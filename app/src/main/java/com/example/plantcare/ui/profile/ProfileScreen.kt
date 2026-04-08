@@ -40,9 +40,17 @@ fun ProfileScreen(
     val textGray = Color(0xFF404943)
     
     var showAccountSettingsModal by remember { mutableStateOf(false) }
+    var showChangePasswordModal by remember { mutableStateOf(false) }
 
     if (showAccountSettingsModal) {
-        AccountSettingsModal(onDismiss = { showAccountSettingsModal = false })
+        AccountSettingsModal(
+            onDismiss = { showAccountSettingsModal = false },
+            onChangePasswordClick = { showChangePasswordModal = true }
+        )
+    }
+
+    if (showChangePasswordModal) {
+        ChangePasswordModal(onDismiss = { showChangePasswordModal = false })
     }
 
     Scaffold(
@@ -298,7 +306,7 @@ fun ProfileBottomNavigationBar(
 }
 
 @Composable
-fun AccountSettingsModal(onDismiss: () -> Unit) {
+fun AccountSettingsModal(onDismiss: () -> Unit, onChangePasswordClick: () -> Unit) {
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false) // to allow custom width
@@ -306,7 +314,8 @@ fun AccountSettingsModal(onDismiss: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.9f) // 90% of screen width
-                .fillMaxHeight(0.85f)
+                .wrapContentHeight()
+                .heightIn(max = 700.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .background(Color(0xFFF8FAF8))
         ) {
@@ -333,7 +342,7 @@ fun AccountSettingsModal(onDismiss: () -> Unit) {
                 // Content
                 Column(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(1f, fill = false)
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 32.dp)
                 ) {
@@ -349,9 +358,9 @@ fun AccountSettingsModal(onDismiss: () -> Unit) {
                     // Security
                     SectionTitle("SECURITY")
                     Spacer(modifier = Modifier.height(12.dp))
-                    ActionRow(icon = Icons.Outlined.Lock, title = "Change Password")
+                    ActionRow(icon = Icons.Outlined.Lock, title = "Change Password", onClick = onChangePasswordClick)
                     Spacer(modifier = Modifier.height(12.dp))
-                    ActionRowWithSubtitle(icon = Icons.Outlined.Security, title = "Two-Factor\nAuthentication", subtitle = "Enabled")
+                    ActionRowWithSubtitle(icon = Icons.Outlined.Security, title = "Two-Factor\nAuthentication", subtitle = "Enabled", onClick = {})
                     
                     Spacer(modifier = Modifier.height(32.dp))
                     
@@ -417,12 +426,13 @@ fun InfoRow(label: String, value: String) {
 }
 
 @Composable
-fun ActionRow(icon: ImageVector, title: String) {
+fun ActionRow(icon: ImageVector, title: String, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(Color(0xFFE9F0E7))
+            .clickable(onClick = onClick)
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -442,12 +452,13 @@ fun ActionRow(icon: ImageVector, title: String) {
 }
 
 @Composable
-fun ActionRowWithSubtitle(icon: ImageVector, title: String, subtitle: String) {
+fun ActionRowWithSubtitle(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(Color(0xFFE9F0E7))
+            .clickable(onClick = onClick)
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -467,4 +478,189 @@ fun ActionRowWithSubtitle(icon: ImageVector, title: String, subtitle: String) {
         }
         Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.LightGray)
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChangePasswordModal(onDismiss: () -> Unit) {
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    
+    var currentPasswordVisible by remember { mutableStateOf(false) }
+    var newPasswordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .wrapContentHeight() // Fixes empty space bug
+                .heightIn(max = 700.dp) // Limits max height on small screens
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color(0xFFF8FAF8))
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Header
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp, vertical = 24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Change Password",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF0F5238)
+                    )
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .background(Color(0xFFE9F0E7), CircleShape)
+                            .size(36.dp)
+                    ) {
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF0F5238), modifier = Modifier.size(18.dp))
+                    }
+                }
+
+                // Content
+                Column(
+                    modifier = Modifier
+                        .weight(1f, fill = false) // Fixes empty space bug while still allowing scrolling if needed
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 32.dp)
+                ) {
+                    // Current Password
+                    SectionTitle("CURRENT PASSWORD")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    PasswordTextField(
+                        value = currentPassword,
+                        onValueChange = { currentPassword = it },
+                        placeholder = "Enter current password",
+                        isVisible = currentPasswordVisible,
+                        onVisibilityChange = { currentPasswordVisible = it }
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    // New Password
+                    SectionTitle("NEW PASSWORD")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    PasswordTextField(
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        placeholder = "Min. 8 characters",
+                        isVisible = newPasswordVisible,
+                        onVisibilityChange = { newPasswordVisible = it }
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Confirm Password
+                    SectionTitle("CONFIRM NEW PASSWORD")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    PasswordTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        placeholder = "Repeat new password",
+                        isVisible = confirmPasswordVisible,
+                        onVisibilityChange = { confirmPasswordVisible = it }
+                    )
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    // Security Requirements Box
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                            .border(1.dp, Color(0xFFE9F0E7), RoundedCornerShape(16.dp))
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = "Info",
+                            tint = Color(0xFF2D6A4F),
+                            modifier = Modifier.size(20.dp).padding(top = 2.dp)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(text = "Security Requirements", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF0F5238))
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "Your password must be at least 8 characters long and include a mix of letters and numbers for better atelier security.",
+                                fontSize = 12.sp,
+                                color = Color(0xFF404943),
+                                lineHeight = 18.sp
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+
+                // Footer
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, end = 24.dp, bottom = 24.dp, top = 8.dp)
+                ) {
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D6A4F))
+                    ) {
+                        Text(text = "Update Password", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PasswordTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    isVisible: Boolean,
+    onVisibilityChange: (Boolean) -> Unit
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = { Text(text = placeholder, color = Color(0xFF9E9E9E), fontSize = 14.sp) },
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp)),
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = Color(0xFFF1F4F1),
+            focusedContainerColor = Color(0xFFF1F4F1),
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent
+        ),
+        visualTransformation = if (isVisible) androidx.compose.ui.text.input.VisualTransformation.None else androidx.compose.ui.text.input.PasswordVisualTransformation(),
+        trailingIcon = {
+            IconButton(onClick = { onVisibilityChange(!isVisible) }) {
+                Icon(
+                    imageVector = if (isVisible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
+                    contentDescription = if (isVisible) "Hide password" else "Show password",
+                    tint = Color(0xFF625B71)
+                )
+            }
+        }
+    )
 }
