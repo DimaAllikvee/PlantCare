@@ -58,7 +58,8 @@ fun AppNavigation() {
                 },
                 onNavigateToProfile = {
                     navController.navigate(Screen.Profile.route)
-                }
+                },
+                plantViewModel = sharedPlantViewModel
             )
         }
         
