@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalFlorist
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -48,13 +49,14 @@ import com.example.plantcare.ui.theme.TextGray
 @Composable
 fun HomeScreen(
     onNavigateToPlants: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
     plantViewModel: PlantViewModel
 ) {
     val plants by plantViewModel.plants.collectAsState()
     
     var selectedItem by remember { mutableStateOf(0) }
-    val items = listOf("Home", "Calendar", "Plants")
-    val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist)
+    val items = listOf("Home", "Calendar", "Plants", "Profile")
+    val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist, Icons.Filled.Person)
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { if (plants.isEmpty()) 1 else plants.size })
 
@@ -73,6 +75,8 @@ fun HomeScreen(
                             selectedItem = index
                             if (index == 2) {
                                 onNavigateToPlants()
+                            } else if (index == 3) {
+                                onNavigateToProfile()
                             }
                         },
                         colors = NavigationBarItemDefaults.colors(

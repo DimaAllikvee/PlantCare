@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalFlorist
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.WaterDrop
@@ -40,6 +41,7 @@ fun MyPlantsScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToAddNewPlant: () -> Unit = {},
     onNavigateToPlantDetail: (String) -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
     plantViewModel: PlantViewModel = viewModel()
 ) {
     val plants by plantViewModel.plants.collectAsState()
@@ -51,8 +53,8 @@ fun MyPlantsScreen(
 
     var selectedItem by remember { mutableStateOf(2) }
     var searchQuery by remember { mutableStateOf("") }
-    val items = listOf("Home", "Calendar", "Plants")
-    val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist)
+    val items = listOf("Home", "Calendar", "Plants", "Profile")
+    val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist, Icons.Filled.Person)
 
     Scaffold(
         bottomBar = {
@@ -69,6 +71,8 @@ fun MyPlantsScreen(
                             selectedItem = index
                             if (index == 0) {
                                 onNavigateToHome()
+                            } else if (index == 3) {
+                                onNavigateToProfile()
                             }
                         },
                         colors = NavigationBarItemDefaults.colors(
