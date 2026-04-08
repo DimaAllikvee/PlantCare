@@ -24,6 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.plantcare.ui.theme.PrimaryGreen
+import com.example.plantcare.ui.theme.SurfaceLightGreen
+import com.example.plantcare.ui.theme.TextGray
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -270,9 +273,7 @@ fun ProfileBottomNavigationBar(
 ) {
     val items = listOf("Home", "Calendar", "Plants", "Profile")
     val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist, Icons.Filled.Person)
-    val PrimaryGreen = Color(0xFF2D6A4F)
-    val SurfaceLightGreen = Color(0xFFDDE4DC)
-    val TextGray = Color(0xFF8B9E9B)
+    // Removed local color declarations; will use imported ones
 
     NavigationBar(
         containerColor = SurfaceLightGreen,
