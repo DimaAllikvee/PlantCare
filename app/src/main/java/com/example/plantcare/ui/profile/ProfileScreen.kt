@@ -268,40 +268,34 @@ fun ProfileBottomNavigationBar(
     onNavigateToHome: () -> Unit,
     onNavigateToPlants: () -> Unit
 ) {
+    val items = listOf("Home", "Calendar", "Plants", "Profile")
+    val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist, Icons.Filled.Person)
+    val PrimaryGreen = Color(0xFF2D6A4F)
+    val SurfaceLightGreen = Color(0xFFDDE4DC)
+    val TextGray = Color(0xFF8B9E9B)
+
     NavigationBar(
-        containerColor = Color.White.copy(alpha = 0.9f),
-        contentColor = Color(0xFF625B71),
-        modifier = Modifier.clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+        containerColor = SurfaceLightGreen,
+        contentColor = PrimaryGreen
     ) {
-        NavigationBarItem(
-            selected = false,
-            onClick = onNavigateToHome,
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home", fontSize = 12.sp) }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { /* Calendar Tab */ },
-            icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Calendar") },
-            label = { Text("Calendar", fontSize = 12.sp) }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = onNavigateToPlants,
-            icon = { Icon(Icons.Default.LocalFlorist, contentDescription = "Plants") },
-            label = { Text("Plants", fontSize = 12.sp) }
-        )
-        NavigationBarItem(
-            selected = true,
-            onClick = { /* Already in Profile */ },
-            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-            label = { Text("Profile", fontSize = 12.sp) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF0F5238),
-                selectedTextColor = Color(0xFF0F5238),
-                indicatorColor = Color(0xFF95D4B3)
+        items.forEachIndexed { index, item ->
+            NavigationBarItem(
+                icon = { Icon(icons[index], contentDescription = item) },
+                label = { Text(item, fontWeight = FontWeight.Medium) },
+                selected = index == 3, // Profile is the 4th item
+                onClick = { 
+                    if (index == 0) onNavigateToHome()
+                    if (index == 2) onNavigateToPlants()
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = PrimaryGreen,
+                    selectedTextColor = PrimaryGreen,
+                    indicatorColor = PrimaryGreen.copy(alpha = 0.2f),
+                    unselectedIconColor = TextGray,
+                    unselectedTextColor = TextGray
+                )
             )
-        )
+        }
     }
 }
 
