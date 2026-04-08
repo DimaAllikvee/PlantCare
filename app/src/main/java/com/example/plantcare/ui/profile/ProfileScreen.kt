@@ -44,6 +44,7 @@ fun ProfileScreen(
     
     var showAccountSettingsModal by remember { mutableStateOf(false) }
     var showChangePasswordModal by remember { mutableStateOf(false) }
+    var showAppearanceModal by remember { mutableStateOf(false) }
 
     if (showAccountSettingsModal) {
         AccountSettingsModal(
@@ -54,6 +55,10 @@ fun ProfileScreen(
 
     if (showChangePasswordModal) {
         ChangePasswordModal(onDismiss = { showChangePasswordModal = false })
+    }
+
+    if (showAppearanceModal) {
+        AppearanceBottomSheet(onDismiss = { showAppearanceModal = false })
     }
 
     Scaffold(
@@ -161,7 +166,7 @@ fun ProfileScreen(
                     checked = notificationsEnabled,
                     onCheckedChange = { notificationsEnabled = it }
                 )
-                SettingsItem(title = "Appearance", icon = Icons.Outlined.DarkMode)
+                SettingsItem(title = "Appearance", icon = Icons.Outlined.DarkMode, onClick = { showAppearanceModal = true })
                 SettingsItem(title = "Help & Support", icon = Icons.Outlined.HelpOutline)
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -658,4 +663,176 @@ fun PasswordTextField(
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppearanceBottomSheet(onDismiss: () -> Unit) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var selectedTheme by remember { mutableStateOf("Light") }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = Color(0xFFF8F9FB),
+        dragHandle = { BottomSheetDefaults.DragHandle(color = Color(0xFFE1E2E4), width = 48.dp) },
+        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp, vertical = 8.dp)
+        ) {
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Appearance",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF2D6A4F)
+                )
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.Black) // Temporary close icon, Figma uses SVG
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            Text(
+                text = "THEME SELECTION",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF596059),
+                letterSpacing = 0.7.sp
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Light Theme Selection
+            ThemeCard(
+                title = "Light",
+                subtitle = "Soft mist and airy whites",
+                icon = Icons.Outlined.WbSunny,
+                isSelected = selectedTheme == "Light",
+                onClick = { selectedTheme = "Light" }
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Dark Theme Selection
+            ThemeCard(
+                title = "Dark",
+                subtitle = "Deep forest shadows",
+                icon = Icons.Outlined.DarkMode,
+                isSelected = selectedTheme == "Dark",
+                onClick = { selectedTheme = "Dark" }
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // System Theme Selection
+            ThemeCard(
+                title = "System",
+                subtitle = "Adapts to device settings",
+                icon = Icons.Outlined.Settings,
+                isSelected = selectedTheme == "System",
+                onClick = { selectedTheme = "System" }
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // Apply Changes Button
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D6A4F)),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+            ) {
+                Text(text = "Apply Changes", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Footer text
+            Text(
+                text = "Changes will take effect immediately",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF404943),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+fun ThemeCard(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val borderColor = if (isSelected) Color(0xFF0F5238) else Color.Transparent
+    val backgroundColor = if (isSelected) Color.White else Color(0xFFEDEEF0)
+    val computedIconBgColor = if (isSelected) Color(0xFFB1F0CE) else Color(0xFFE1E2E4)
+    
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(backgroundColor)
+            .border(2.dp, borderColor, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(22.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(computedIconBgColor, RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = title, tint = Color(0xFF191C1E), modifier = Modifier.size(24.dp))
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF191C1E))
+                Text(text = subtitle, fontSize = 12.sp, color = Color(0xFF596059))
+            }
+        }
+        
+        // Selection Indicator
+        if (isSelected) {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(Color(0xFF0F5238), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Check, contentDescription = "Selected", tint = Color.White, modifier = Modifier.size(16.dp))
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .border(2.dp, Color(0xFFBFC9C1), CircleShape)
+            )
+        }
+    }
 }
