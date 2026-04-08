@@ -55,6 +55,9 @@ fun AppNavigation() {
             HomeScreen(
                 onNavigateToPlants = {
                     navController.navigate(Screen.MyPlants.route)
+                },
+                onNavigateToProfile = {
+                    navController.navigate(Screen.Profile.route)
                 }
             )
         }
@@ -71,6 +74,9 @@ fun AppNavigation() {
                 },
                 onNavigateToPlantDetail = { plantId ->
                     navController.navigate(Screen.PlantDetail.createRoute(plantId))
+                },
+                onNavigateToProfile = {
+                    navController.navigate(Screen.Profile.route)
                 },
                 plantViewModel = sharedPlantViewModel
             )
@@ -96,6 +102,27 @@ fun AppNavigation() {
                     plantViewModel = sharedPlantViewModel
                 )
             }
+        }
+
+        composable(Screen.Profile.route) {
+            com.example.plantcare.ui.profile.ProfileScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onNavigateToPlants = {
+                    navController.navigate(Screen.MyPlants.route) {
+                        popUpTo(Screen.Home.route) { inclusive = false }
+                    }
+                },
+                onLogout = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }
