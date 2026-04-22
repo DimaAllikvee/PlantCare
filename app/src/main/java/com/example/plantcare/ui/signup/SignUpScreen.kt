@@ -229,7 +229,6 @@ fun SignUpScreen(
                 if (password == confirmPassword) {
                     authViewModel.signUp(email, password, username)
                 } else {
-                    // Quick validation error just resetting states if needed, but normally handled in viewmodel or state
                 }
             },
             shape = RoundedCornerShape(36.dp),
