@@ -100,7 +100,6 @@ class PlantViewModel : ViewModel() {
                 _plants.value = plantList
             }
             .addOnFailureListener { e ->
-                // handle error if needed
             }
     }
 
