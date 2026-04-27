@@ -52,6 +52,14 @@ We are using **Kanban** as our development model. Kanban is a simple and flexibl
 | Dima Allikvee | [@DimaAllikvee](https://github.com/DimaAllikvee) |
 | Juri Allikvee | [@JuriAllikvee](https://github.com/JuriAllikvee) |
 
+
+
+## Persoona
+<img width="1136" height="826" alt="image" src="https://github.com/user-attachments/assets/f7009c24-7821-4e8a-9858-5befbd6f13b9" />
+<img width="1134" height="857" alt="image" src="https://github.com/user-attachments/assets/1c4696b7-5383-4459-b9d1-d3c5233e23f8" />
+
+
+
 ## How to Run
 
 
