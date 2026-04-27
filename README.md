@@ -53,13 +53,6 @@ We are using **Kanban** as our development model. Kanban is a simple and flexibl
 | Juri Allikvee | [@JuriAllikvee](https://github.com/JuriAllikvee) |
 
 ## How to Run
-1.Clone the repository
-2.Open the project in Android Studio
-3.Sync Gradle dependencies
-4.Run the app on an emulator or physical device
-## Persoona 
-<img width="1144" height="865" alt="image" src="https://github.com/user-attachments/assets/59c88e0b-5641-44fd-95ae-432db0961467" />
-<img width="1136" height="826" alt="image" src="https://github.com/user-attachments/assets/e317dd25-c85f-4d63-a480-ae5087845be0" />
 
 
 
