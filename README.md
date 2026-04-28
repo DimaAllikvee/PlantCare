@@ -70,7 +70,7 @@ On Saturday morning, Mark performs his weekly maintenance for his 32 indoor plan
 5. **As a user**, I want to see the care history of each plant with photos to track how changes have affected the plant's health.
 
 
-## Persoona
+## Persoonad
 <img width="1136" height="826" alt="image" src="https://github.com/user-attachments/assets/f7009c24-7821-4e8a-9858-5befbd6f13b9" />
 <img width="1134" height="857" alt="image" src="https://github.com/user-attachments/assets/1c4696b7-5383-4459-b9d1-d3c5233e23f8" />
 
