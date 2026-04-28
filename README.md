@@ -53,6 +53,22 @@ We are using **Kanban** as our development model. Kanban is a simple and flexibl
 | Juri Allikvee | [@JuriAllikvee](https://github.com/JuriAllikvee) |
 
 
+## User Scenarios
+
+### Scenario 1 - Sofia (The Beginner)
+Sofia comes home after a long day at work and notices that her palm leaf has turned yellow. She can't remember when she last watered it. Sofia opens the **PlantCare** app and sees a notification on the home screen: *"2 plants need watering today."* She taps on the palm leaf image, sees simple instructions (*"water with 200 ml of lukewarm water"*), and marks the task as done with a single click. The app automatically sets the next reminder for 7 days later.
+
+### Scenario 2 - Mark (The Collector)
+On Saturday morning, Mark performs his weekly maintenance for his 32 indoor plants. He opens the **PlantCare** app, where he sees all his plants in a list with their recent care history. Mark notices that one orchid hasn't bloomed for a month. Looking at the history, he sees that he changed the fertilizer three weeks ago. He adds a note to the plant's profile, uploads a new photo, and adjusts the fertilization frequency. All actions are saved in the history for future comparison.
+
+## User Stories
+
+1. **As a user**, I want to receive notifications before watering my plants so that I don't forget to care for them.
+2. **As a user**, I want to see simple care instructions for each plant so that I can look after them without prior knowledge.
+3. **As a user**, I want to mark a plant as watered with a single button press so that the next reminder is scheduled automatically.
+4. **As a user**, I want to add multiple plants and group them to manage my entire collection in one place.
+5. **As a user**, I want to see the care history of each plant with photos to track how changes have affected the plant's health.
+
 
 ## Persoona
 <img width="1136" height="826" alt="image" src="https://github.com/user-attachments/assets/f7009c24-7821-4e8a-9858-5befbd6f13b9" />
