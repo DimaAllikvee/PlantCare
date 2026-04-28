@@ -71,8 +71,9 @@ On Saturday morning, Mark performs his weekly maintenance for his 32 indoor plan
 
 
 ## Persoonad
-<img width="1136" height="826" alt="image" src="https://github.com/user-attachments/assets/f7009c24-7821-4e8a-9858-5befbd6f13b9" />
-<img width="1134" height="857" alt="image" src="https://github.com/user-attachments/assets/1c4696b7-5383-4459-b9d1-d3c5233e23f8" />
+<img width="1041" height="797" alt="image" src="https://github.com/user-attachments/assets/ecaea036-b4a3-4c0b-99fd-3f146bee29ab" />
+<img width="953" height="717" alt="image" src="https://github.com/user-attachments/assets/ecb4df13-42ed-484a-91d5-46c1382c7ef3" />
+
 
 figma - https://www.figma.com/design/YExjZgzFM9L891UqobFcvF/User-Personas?node-id=0-1&t=Rzon2YKzTWBBPAbz-1
 
