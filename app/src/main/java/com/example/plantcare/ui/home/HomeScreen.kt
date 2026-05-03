@@ -101,15 +101,27 @@ fun HomeScreen(
                     
                     Box(modifier = Modifier.fillMaxSize()) {
                         // Background Plant Image
-                        Image(
-                            painter = painterResource(id = R.drawable.ficus_elastica),
-                            contentDescription = plant.name,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(330.dp),
-                            contentScale = ContentScale.Crop,
-                            alignment = Alignment.TopCenter
-                        )
+                        if (plant.imageUrl.isNotEmpty()) {
+                            coil.compose.AsyncImage(
+                                model = plant.imageUrl,
+                                contentDescription = plant.name,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(330.dp),
+                                contentScale = ContentScale.Crop,
+                                alignment = Alignment.TopCenter
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(id = R.drawable.ficus_elastica),
+                                contentDescription = plant.name,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(330.dp),
+                                contentScale = ContentScale.Crop,
+                                alignment = Alignment.TopCenter
+                            )
+                        }
                         
                         // Home Card Overlapping the Image
                         HomeCard(

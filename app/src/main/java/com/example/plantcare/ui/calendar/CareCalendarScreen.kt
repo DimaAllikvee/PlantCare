@@ -258,6 +258,7 @@ fun CareCalendarScreen(
                         key(taskInfo.plant.id, taskInfo.taskType, taskInfo.isCompleted) {
                             TaskCard(
                                 plantName = taskInfo.plant.name,
+                                imageUrl = taskInfo.plant.imageUrl,
                                 taskType = taskInfo.taskType,
                                 isCompleted = taskInfo.isCompleted,
                                 onToggle = {
@@ -353,6 +354,7 @@ fun DateCard(
 @Composable
 fun TaskCard(
     plantName: String,
+    imageUrl: String = "",
     taskType: String,
     isCompleted: Boolean,
     onToggle: () -> Unit,
@@ -417,13 +419,21 @@ fun TaskCard(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 // In a real app with AsyncImage, we'd use plant.imageUrl
-                // For now we use the placeholder
-                Image(
-                    painter = painterResource(id = R.drawable.ficus_elastica),
-                    contentDescription = plantName,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+                if (imageUrl.isNotEmpty()) {
+                    coil.compose.AsyncImage(
+                        model = imageUrl,
+                        contentDescription = plantName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.ficus_elastica),
+                        contentDescription = plantName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.width(16.dp))

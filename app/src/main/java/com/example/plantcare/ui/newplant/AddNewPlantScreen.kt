@@ -80,14 +80,22 @@ fun AddNewPlantScreen(
     // Auto-fill when details arrive from API
     LaunchedEffect(selectedDetails) {
         selectedDetails?.let { details ->
-            details.commonName?.let { plantSpecies = it }
+            details.commonName?.let { 
+                plantSpecies = it 
+                if (plantName.isBlank()) {
+                    plantName = it.replaceFirstChar { char -> char.uppercase() }
+                }
+            }
             selectedSunlight = catalogViewModel.mapSunlight(details.sunlight)
             val interval = catalogViewModel.mapWateringToInterval(
                 details.watering,
                 details.wateringBenchmark?.value
             )
             wateringInterval = interval
-            details.defaultImage?.regularUrl?.let { selectedImageUrl = it }
+            val imgUrl = details.defaultImage?.regularUrl ?: details.defaultImage?.originalUrl
+            if (!imgUrl.isNullOrEmpty()) {
+                selectedImageUrl = imgUrl
+            }
             catalogViewModel.clearSelectedDetails()
         }
     }

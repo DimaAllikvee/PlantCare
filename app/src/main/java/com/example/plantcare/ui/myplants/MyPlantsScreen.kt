@@ -205,14 +205,22 @@ fun PlantListCard(
                     .clip(RoundedCornerShape(12.dp))
                     .background(SurfaceLightGreen)
             ) {
-                val imagePainter = painterResource(id = R.drawable.ficus_elastica)
-                
-                Image(
-                    painter = imagePainter,
-                    contentDescription = name,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+                if (imageUrl.isNotEmpty()) {
+                    coil.compose.AsyncImage(
+                        model = imageUrl,
+                        contentDescription = name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    val imagePainter = painterResource(id = R.drawable.ficus_elastica)
+                    Image(
+                        painter = imagePainter,
+                        contentDescription = name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.width(16.dp))

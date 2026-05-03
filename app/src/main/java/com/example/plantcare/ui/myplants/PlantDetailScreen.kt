@@ -117,12 +117,21 @@ fun PlantDetailScreen(
                     .height(300.dp)
                     .background(SurfaceLightGreen)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ficus_elastica), // Fallback image for now
-                    contentDescription = plant.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
+                if (plant.imageUrl.isNotEmpty()) {
+                    coil.compose.AsyncImage(
+                        model = plant.imageUrl,
+                        contentDescription = plant.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.ficus_elastica), // Fallback image for now
+                        contentDescription = plant.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
