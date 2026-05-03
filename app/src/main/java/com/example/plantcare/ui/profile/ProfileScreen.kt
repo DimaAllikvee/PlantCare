@@ -50,7 +50,8 @@ fun ProfileScreen(
     onNavigateToPlants: () -> Unit = {},
     onNavigateToCalendar: () -> Unit = {},
     onLogout: () -> Unit = {},
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
+    plantViewModel: com.example.plantcare.ui.myplants.PlantViewModel
 ) {
     val backgroundColor = MaterialTheme.colorScheme.background
     val textDarkGreen = MaterialTheme.colorScheme.onBackground
@@ -62,6 +63,8 @@ fun ProfileScreen(
     var showChangePasswordModal by remember { mutableStateOf(false) }
     var showChangeEmailModal by remember { mutableStateOf(false) }
     var showAppearanceModal by remember { mutableStateOf(false) }
+
+    val plants by plantViewModel.plants.collectAsState()
 
     val authState by authViewModel.authState.collectAsState()
     val currentUserEmail = remember { FirebaseAuth.getInstance().currentUser?.email ?: "Unknown" }
@@ -222,12 +225,32 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(32.dp))
             
             // Stats row
+            val today = java.time.LocalDate.now()
+            val dueTodayCount = remember(plants) {
+                var count = 0
+                plants.forEach { plant ->
+                    val lastWateredDate = java.time.Instant.ofEpochMilli(plant.lastWatered).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                    val wateringInterval = try { "\\d+".toRegex().find(plant.wateringInterval)?.value?.toInt() ?: 7 } catch (e: Exception) { 7 }
+                    val daysSinceWatered = java.time.temporal.ChronoUnit.DAYS.between(lastWateredDate, today).toInt()
+                    
+                    if (plant.nextWateringOverride != null) {
+                         val overrideDate = java.time.Instant.ofEpochMilli(plant.nextWateringOverride).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                         if (overrideDate == today) count++
+                    } else if (daysSinceWatered > 0) {
+                        val isDue = daysSinceWatered % wateringInterval == 0
+                        val isOverdue = daysSinceWatered > wateringInterval
+                        if (isDue || isOverdue) count++
+                    }
+                }
+                count
+            }
+            
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                StatCard(modifier = Modifier.weight(1f), count = "12", label = "PLANTS", backgroundColor = surfaceLightGreen, contentColor = textDarkGreen)
-                StatCard(modifier = Modifier.weight(1f), count = "7", label = "DUE TODAY", backgroundColor = surfaceLightGreen, contentColor = textDarkGreen)
+                StatCard(modifier = Modifier.weight(1f), count = plants.size.toString(), label = "PLANTS", backgroundColor = surfaceLightGreen, contentColor = textDarkGreen)
+                StatCard(modifier = Modifier.weight(1f), count = dueTodayCount.toString(), label = "DUE TODAY", backgroundColor = surfaceLightGreen, contentColor = textDarkGreen)
             }
             
             Spacer(modifier = Modifier.height(32.dp))
@@ -483,7 +506,7 @@ fun ActionRow(icon: ImageVector, title: String, onClick: () -> Unit = {}) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFE9F0E7))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
