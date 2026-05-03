@@ -58,7 +58,7 @@ fun CareCalendarScreen(
     onNavigateToProfile: () -> Unit = {},
     plantViewModel: PlantViewModel = viewModel()
 ) {
-    val backgroundColor = Color(0xFFF1F2F4)
+    val backgroundColor = MaterialTheme.colorScheme.background
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var taskToReschedule by remember { mutableStateOf<TaskCardInfo?>(null) }
     
@@ -155,7 +155,7 @@ fun CareCalendarScreen(
                 title = { 
                     Text(
                         text = "Care Calendar",
-                        color = PrimaryGreen,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 24.sp
                     ) 
@@ -186,7 +186,7 @@ fun CareCalendarScreen(
                 text = monthYear,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = PrimaryGreen,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
             
@@ -217,7 +217,7 @@ fun CareCalendarScreen(
                 text = "Tasks for Today",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = PrimaryGreen,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
             
@@ -319,9 +319,9 @@ fun DateCard(
     val dayOfWeek = date.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, Locale.ENGLISH).uppercase()
     val dayOfMonth = date.dayOfMonth.toString()
     
-    val bgColor = if (isSelected) PrimaryGreen else Color.White
-    val textColor = if (isSelected) Color.White else PrimaryGreen
-    val subTextColor = if (isSelected) Color.White.copy(alpha = 0.8f) else TextGray
+    val bgColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+    val subTextColor = if (isSelected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
 
     Column(
         modifier = Modifier
@@ -368,7 +368,7 @@ fun TaskCard(
     
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -389,10 +389,10 @@ fun TaskCard(
                 modifier = Modifier
                     .size(24.dp)
                     .clip(CircleShape)
-                    .background(if (completed) PrimaryGreen else Color.Transparent)
+                    .background(if (completed) MaterialTheme.colorScheme.primary else Color.Transparent)
                     .border(
                         width = 1.dp,
-                        color = if (completed) Color.Transparent else TextGray,
+                        color = if (completed) Color.Transparent else MaterialTheme.colorScheme.onSurfaceVariant,
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -414,7 +414,7 @@ fun TaskCard(
                 modifier = Modifier
                     .size(56.dp)
                     .clip(CircleShape)
-                    .background(CardBackground)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 // In a real app with AsyncImage, we'd use plant.imageUrl
                 // For now we use the placeholder
@@ -434,7 +434,7 @@ fun TaskCard(
                     text = plantName,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = if (completed) TextGray else PrimaryGreen,
+                    color = if (completed) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary,
                     textDecoration = if (completed) TextDecoration.LineThrough else null
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -442,7 +442,7 @@ fun TaskCard(
                     Icon(
                         imageVector = icon,
                         contentDescription = taskType,
-                        tint = TextGray,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -450,7 +450,7 @@ fun TaskCard(
                         text = taskType,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
-                        color = TextGray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -462,7 +462,7 @@ fun TaskCard(
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "Reschedule",
-                        tint = TextGray
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

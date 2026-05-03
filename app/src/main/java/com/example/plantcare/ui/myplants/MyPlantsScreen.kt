@@ -69,7 +69,7 @@ fun MyPlantsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF1F2F4))
+                .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
         ) {
@@ -253,20 +253,20 @@ fun PlantListCard(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(if (isDue) Color(0xFFFFF3E0) else SurfaceLightGreen)
+                        .background(if (isDue) Color(0xFFFFF3E0) else androidx.compose.material3.MaterialTheme.colorScheme.secondary)
                         .padding(horizontal = 8.dp, vertical = 6.dp)
                 ) {
                     Icon(
                         imageVector = if (isDue) Icons.Outlined.Schedule else Icons.Outlined.WaterDrop,
                         contentDescription = statusText,
-                        tint = if (isDue) Color(0xFFFF9800) else PrimaryGreen,
+                        tint = if (isDue) Color(0xFFFF9800) else androidx.compose.material3.MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
                         text = statusText,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (isDue) Color(0xFFFF9800) else PrimaryGreen
+                        color = if (isDue) Color(0xFFFF9800) else androidx.compose.material3.MaterialTheme.colorScheme.primary
                     )
                 }
             }

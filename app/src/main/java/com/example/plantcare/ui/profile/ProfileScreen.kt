@@ -24,6 +24,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.collectAsState
+import com.example.plantcare.data.ThemePreferenceManager
+import com.example.plantcare.data.ThemeMode
 import com.example.plantcare.ui.navigation.PlantCareBottomNavigation
 import com.example.plantcare.ui.theme.PrimaryGreen
 import com.example.plantcare.ui.theme.SurfaceLightGreen
@@ -39,11 +43,11 @@ fun ProfileScreen(
     onNavigateToCalendar: () -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
-    val backgroundColor = Color(0xFFF8F9FB)
-    val textDarkGreen = Color(0xFF0F5238)
-    val surfaceLightGreen = Color(0xFFDDE4DC)
-    val PrimaryGreen = Color(0xFF2D6A4F)
-    val textGray = Color(0xFF404943)
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val textDarkGreen = MaterialTheme.colorScheme.onBackground
+    val surfaceLightGreen = MaterialTheme.colorScheme.secondary
+    val primaryGreen = MaterialTheme.colorScheme.primary
+    val textGray = MaterialTheme.colorScheme.onSurfaceVariant
     
     var showAccountSettingsModal by remember { mutableStateOf(false) }
     var showChangePasswordModal by remember { mutableStateOf(false) }
@@ -660,8 +664,12 @@ fun PasswordTextField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppearanceBottomSheet(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val themeManager = remember { ThemePreferenceManager.getInstance(context) }
+    val currentThemeMode by themeManager.themeMode.collectAsState()
+    
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var selectedTheme by remember { mutableStateOf("Light") }
+    var selectedTheme by remember(currentThemeMode) { mutableStateOf(currentThemeMode.name.lowercase().replaceFirstChar { it.uppercase() }) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -742,7 +750,15 @@ fun AppearanceBottomSheet(onDismiss: () -> Unit) {
             
             // Apply Changes Button
             Button(
-                onClick = onDismiss,
+                onClick = { 
+                    val newMode = when (selectedTheme) {
+                        "Light" -> ThemeMode.LIGHT
+                        "Dark" -> ThemeMode.DARK
+                        else -> ThemeMode.SYSTEM
+                    }
+                    themeManager.setThemeMode(newMode)
+                    onDismiss() 
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

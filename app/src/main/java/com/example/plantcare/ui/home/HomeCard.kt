@@ -57,7 +57,7 @@ fun HomeWidget(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier
-            .background(WidgetBackground, RoundedCornerShape(100.dp))
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(100.dp))
             .height(32.dp)
             .padding(horizontal = 12.dp)
     ) {
@@ -65,7 +65,7 @@ fun HomeWidget(
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = text,
-            color = WidgetText,
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold
         )
@@ -84,7 +84,7 @@ fun MoistureChart(
     )
 
     val arcColor = when {
-        animatedPercent > 0.4f -> PrimaryGreen
+        animatedPercent > 0.4f -> androidx.compose.material3.MaterialTheme.colorScheme.primary
         animatedPercent > 0.2f -> Color(0xFFFF9800) // Orange warning
         else -> Color(0xFFE53935) // Red alert!
     }
@@ -120,19 +120,19 @@ fun MoistureChart(
                 text = "${(animatedPercent * 100).toInt()}%",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                color = WidgetText
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = "Moisture Level",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = WidgetText
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(4.dp))
             Icon(
                 imageVector = Icons.Outlined.WaterDrop,
                 contentDescription = null,
-                tint = TextGray,
+                tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -179,7 +179,7 @@ fun HomeCard(
             .fillMaxWidth()
             .shadow(elevation = 20.dp, shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp))
             .clip(RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp))
-            .background(CardBackground)
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.surface)
             .padding(top = 39.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
     ) {
         // Plant Title and Last Watered
@@ -187,21 +187,21 @@ fun HomeCard(
             text = plantName,
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
-            color = PrimaryGreen
+            color = androidx.compose.material3.MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Outlined.WaterDrop,
                 contentDescription = null,
-                tint = PrimaryGreen,
+                tint = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "Last watered: $lastWateredText",
                 fontSize = 16.sp,
-                color = TextGray,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -213,7 +213,7 @@ fun HomeCard(
             text = "Care Info",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = WidgetText,
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         
@@ -222,15 +222,15 @@ fun HomeCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             HomeWidget(
-                icon = { Icon(Icons.Outlined.WaterDrop, contentDescription = null, tint = PrimaryGreen, modifier = Modifier.size(14.dp)) },
+                icon = { Icon(Icons.Outlined.WaterDrop, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp)) },
                 text = plant?.wateringInterval ?: "Weekly"
             )
             HomeWidget(
-                icon = { Icon(Icons.Outlined.WbSunny, contentDescription = null, tint = PrimaryGreen, modifier = Modifier.size(14.dp)) },
+                icon = { Icon(Icons.Outlined.WbSunny, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp)) },
                 text = plant?.sunlightNeeds ?: "Indirect"
             )
             HomeWidget(
-                icon = { Icon(Icons.Outlined.Thermostat, contentDescription = null, tint = PrimaryGreen, modifier = Modifier.size(14.dp)) },
+                icon = { Icon(Icons.Outlined.Thermostat, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary, modifier = Modifier.size(14.dp)) },
                 text = "20-25 °C"
             )
         }
@@ -256,7 +256,7 @@ fun HomeCard(
                 .fillMaxWidth()
                 .height(53.dp)
                 .padding(horizontal = 16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
+            colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(26.5.dp)
         ) {
             Icon(Icons.Default.Check, contentDescription = null)

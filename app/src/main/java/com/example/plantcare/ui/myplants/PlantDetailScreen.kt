@@ -54,7 +54,7 @@ fun PlantDetailScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFF1F2F4)
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background
                 )
             )
         },
@@ -63,7 +63,7 @@ fun PlantDetailScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFF1F2F4))
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                         .padding(24.dp)
                 ) {
                     Button(
@@ -92,7 +92,7 @@ fun PlantDetailScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF1F2F4))
+                .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally

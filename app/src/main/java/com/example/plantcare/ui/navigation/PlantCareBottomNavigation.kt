@@ -37,8 +37,8 @@ fun PlantCareBottomNavigation(
     )
 
     NavigationBar(
-        containerColor = SurfaceLightGreen,
-        contentColor = PrimaryGreen,
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondary,
+        contentColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
         tonalElevation = 8.dp
     ) {
         items.forEachIndexed { index, item ->
@@ -64,11 +64,11 @@ fun PlantCareBottomNavigation(
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PrimaryGreen,
-                    selectedTextColor = PrimaryGreen,
-                    indicatorColor = PrimaryGreen.copy(alpha = 0.2f),
-                    unselectedIconColor = TextGray,
-                    unselectedTextColor = TextGray
+                    selectedIconColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                    selectedTextColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                    indicatorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                    unselectedIconColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
                 )
             )
         }

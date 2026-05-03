@@ -71,7 +71,7 @@ fun AddNewPlantScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFF1F2F4)
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background
                 )
             )
         },
@@ -79,7 +79,7 @@ fun AddNewPlantScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF1F2F4))
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                     .padding(24.dp)
             ) {
                 Column {
@@ -130,7 +130,7 @@ fun AddNewPlantScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF1F2F4))
+                .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
@@ -201,7 +201,7 @@ fun AddNewPlantScreen(
                 ExposedDropdownMenu(
                     expanded = expandedWatering,
                     onDismissRequest = { expandedWatering = false },
-                    modifier = Modifier.background(CardBackground)
+                    modifier = Modifier.background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     wateringOptions.forEach { selectionOption ->
                         DropdownMenuItem(
@@ -237,7 +237,7 @@ fun AddNewPlantScreen(
                 ExposedDropdownMenu(
                     expanded = expandedMisting,
                     onDismissRequest = { expandedMisting = false },
-                    modifier = Modifier.background(CardBackground)
+                    modifier = Modifier.background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     mistingOptions.forEach { selectionOption ->
                         DropdownMenuItem(
@@ -273,7 +273,7 @@ fun AddNewPlantScreen(
                 ExposedDropdownMenu(
                     expanded = expandedFertilizing,
                     onDismissRequest = { expandedFertilizing = false },
-                    modifier = Modifier.background(CardBackground)
+                    modifier = Modifier.background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     fertilizingOptions.forEach { selectionOption ->
                         DropdownMenuItem(
@@ -305,8 +305,8 @@ fun AddNewPlantScreen(
                     .fillMaxWidth()
                     .height(52.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-                    .background(Color.White),
+                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.surface),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val sunlightOptions = listOf("Low", "Medium", "High")
@@ -343,7 +343,7 @@ fun AddNewPlantScreen(
 
                     // Vertical Divider
                     if (index < 2) {
-                        Box(modifier = Modifier.width(1.dp).fillMaxHeight(0.6f).background(Color(0xFFE0E0E0)))
+                        Box(modifier = Modifier.width(1.dp).fillMaxHeight(0.6f).background(androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant))
                     }
                 }
             }
@@ -383,8 +383,8 @@ fun PlantInputField(
             trailingIcon = trailingIcon,
             readOnly = readOnly,
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = CardBackground,
-                focusedContainerColor = CardBackground,
+                unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedBorderColor = Color.Transparent,
                 focusedBorderColor = PrimaryGreen,
             ),
