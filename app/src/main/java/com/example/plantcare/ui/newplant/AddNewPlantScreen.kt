@@ -35,16 +35,34 @@ import com.example.plantcare.ui.theme.TextGray
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNewPlantScreen(
+    plantId: String? = null,
     onNavigateBack: () -> Unit = {},
     plantViewModel: PlantViewModel = viewModel()
 ) {
     val plantState by plantViewModel.plantState.collectAsState()
+    val plants by plantViewModel.plants.collectAsState()
+    val isEditMode = plantId != null
+
     var plantName by remember { mutableStateOf("") }
     var plantSpecies by remember { mutableStateOf("") }
     var wateringInterval by remember { mutableStateOf("") }
     var mistingInterval by remember { mutableStateOf("None") }
     var fertilizingInterval by remember { mutableStateOf("None") }
     var selectedSunlight by remember { mutableStateOf("Medium") }
+    
+    LaunchedEffect(plantId, plants) {
+        if (isEditMode) {
+            val existingPlant = plants.find { it.id == plantId }
+            if (existingPlant != null) {
+                plantName = existingPlant.name
+                plantSpecies = existingPlant.species
+                wateringInterval = existingPlant.wateringInterval
+                mistingInterval = existingPlant.mistingInterval
+                fertilizingInterval = existingPlant.fertilizingInterval
+                selectedSunlight = existingPlant.sunlightNeeds
+            }
+        }
+    }
     
     var expandedWatering by remember { mutableStateOf(false) }
     var expandedMisting by remember { mutableStateOf(false) }
@@ -59,7 +77,7 @@ fun AddNewPlantScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        "Add New Plant", 
+                        if (isEditMode) "Edit Plant" else "Add New Plant", 
                         fontWeight = FontWeight.Bold, 
                         color = PrimaryGreen,
                         fontSize = 20.sp
@@ -93,15 +111,28 @@ fun AddNewPlantScreen(
 
                     Button(
                         onClick = { 
-                            plantViewModel.addPlant(
-                                name = plantName,
-                                species = plantSpecies,
-                                interval = wateringInterval.ifEmpty { "Every 7 days" },
-                                mistingInterval = mistingInterval,
-                                fertilizingInterval = fertilizingInterval,
-                                sunlight = selectedSunlight,
-                                imageUrl = ""
-                            )
+                            if (isEditMode) {
+                                plantViewModel.updatePlant(
+                                    plantId = plantId!!,
+                                    name = plantName,
+                                    species = plantSpecies,
+                                    interval = wateringInterval.ifEmpty { "Every 7 days" },
+                                    mistingInterval = mistingInterval,
+                                    fertilizingInterval = fertilizingInterval,
+                                    sunlight = selectedSunlight,
+                                    imageUrl = ""
+                                )
+                            } else {
+                                plantViewModel.addPlant(
+                                    name = plantName,
+                                    species = plantSpecies,
+                                    interval = wateringInterval.ifEmpty { "Every 7 days" },
+                                    mistingInterval = mistingInterval,
+                                    fertilizingInterval = fertilizingInterval,
+                                    sunlight = selectedSunlight,
+                                    imageUrl = ""
+                                )
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -113,7 +144,7 @@ fun AddNewPlantScreen(
                         if (plantState is PlantState.Loading) {
                             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                         } else {
-                            Text("Save Plant", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                            Text(if (isEditMode) "Save Changes" else "Save Plant", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
                         }
                     }
                 }
@@ -153,7 +184,7 @@ fun AddNewPlantScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Upload Plant Photo",
+                if (isEditMode) "Change Plant Photo" else "Upload Plant Photo",
                 color = PrimaryGreen,
                 fontWeight = FontWeight.Medium,
                 fontSize = 14.sp

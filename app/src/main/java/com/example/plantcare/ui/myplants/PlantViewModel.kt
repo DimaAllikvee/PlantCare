@@ -75,6 +75,50 @@ class PlantViewModel : ViewModel() {
             }
     }
 
+    fun updatePlant(
+        plantId: String,
+        name: String, 
+        species: String, 
+        interval: String, 
+        mistingInterval: String, 
+        fertilizingInterval: String, 
+        sunlight: String, 
+        imageUrl: String
+    ) {
+        val user = auth.currentUser
+        if (user == null) {
+            _plantState.value = PlantState.Error("User not logged in")
+            return
+        }
+        
+        if (name.isBlank() || species.isBlank() || interval.isBlank()) {
+            _plantState.value = PlantState.Error("Please fill in all details")
+            return
+        }
+
+        _plantState.value = PlantState.Loading
+        
+        val updates = mapOf(
+            "name" to name,
+            "species" to species,
+            "wateringInterval" to interval,
+            "mistingInterval" to mistingInterval,
+            "fertilizingInterval" to fertilizingInterval,
+            "sunlightNeeds" to sunlight,
+            "imageUrl" to imageUrl
+        )
+
+        db.collection("plants").document(plantId)
+            .update(updates)
+            .addOnSuccessListener {
+                _plantState.value = PlantState.Success
+                fetchPlants() // refresh the list
+            }
+            .addOnFailureListener { e ->
+                _plantState.value = PlantState.Error(e.message ?: "Error updating plant")
+            }
+    }
+
     fun deletePlant(plantId: String) {
         _plantState.value = PlantState.Loading
         db.collection("plants").document(plantId)

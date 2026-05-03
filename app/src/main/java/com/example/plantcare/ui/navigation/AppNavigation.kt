@@ -106,6 +106,22 @@ fun AppNavigation() {
                     onNavigateBack = {
                         navController.popBackStack()
                     },
+                    onNavigateToEdit = { editPlantId ->
+                        navController.navigate(Screen.EditPlant.createRoute(editPlantId))
+                    },
+                    plantViewModel = sharedPlantViewModel
+                )
+            }
+        }
+
+        composable(Screen.EditPlant.route) { backStackEntry ->
+            val plantId = backStackEntry.arguments?.getString("plantId")
+            if (plantId != null) {
+                AddNewPlantScreen(
+                    plantId = plantId,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
                     plantViewModel = sharedPlantViewModel
                 )
             }

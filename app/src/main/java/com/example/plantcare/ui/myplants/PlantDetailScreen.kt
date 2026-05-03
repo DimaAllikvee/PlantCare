@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,6 +31,7 @@ import com.example.plantcare.ui.theme.TextGray
 fun PlantDetailScreen(
     plantId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToEdit: (String) -> Unit,
     plantViewModel: PlantViewModel
 ) {
     val plants by plantViewModel.plants.collectAsState()
@@ -51,6 +53,11 @@ fun PlantDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = PrimaryGreen)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { onNavigateToEdit(plantId) }) {
+                        Icon(androidx.compose.material.icons.Icons.Filled.Edit, contentDescription = "Edit", tint = PrimaryGreen)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
