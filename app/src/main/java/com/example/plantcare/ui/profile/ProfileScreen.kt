@@ -33,6 +33,10 @@ import com.example.plantcare.ui.theme.PrimaryGreen
 import com.example.plantcare.ui.theme.SurfaceLightGreen
 import com.example.plantcare.ui.theme.TextGray
 import com.example.plantcare.ui.settings.ChangeEmailModal
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.plantcare.ui.login.AuthViewModel
 import com.example.plantcare.ui.login.AuthState
@@ -61,6 +65,15 @@ fun ProfileScreen(
 
     val authState by authViewModel.authState.collectAsState()
     val currentUserEmail = remember { FirebaseAuth.getInstance().currentUser?.email ?: "Unknown" }
+    val currentUserPhoto = remember(authState) { FirebaseAuth.getInstance().currentUser?.photoUrl }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            authViewModel.uploadProfilePhoto(uri)
+        }
+    }
 
     // Reset auth state when modals close
     LaunchedEffect(showChangePasswordModal, showChangeEmailModal) {
@@ -159,8 +172,26 @@ fun ProfileScreen(
                         .border(4.dp, Color.White, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Placeholder for Avatar Image
-                    Box(modifier = Modifier.size(120.dp).clip(CircleShape).background(Color.LightGray))
+                    if (currentUserPhoto != null) {
+                        AsyncImage(
+                            model = currentUserPhoto,
+                            contentDescription = "Profile Photo",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize().clip(CircleShape)
+                        )
+                    } else {
+                        // Placeholder for Avatar Image
+                        Box(modifier = Modifier.size(120.dp).clip(CircleShape).background(Color.LightGray))
+                    }
+                    
+                    if (authState is AuthState.Loading) {
+                        Box(
+                            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.3f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Color.White)
+                        }
+                    }
                 }
                 
                 // Edit Button overlapping
@@ -171,7 +202,7 @@ fun ProfileScreen(
                         .size(32.dp)
                         .background(PrimaryGreen, CircleShape)
                         .border(2.dp, Color.White, CircleShape)
-                        .clickable { /* Edit Action */ },
+                        .clickable { photoPickerLauncher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(

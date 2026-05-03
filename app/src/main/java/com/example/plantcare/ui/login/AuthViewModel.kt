@@ -5,6 +5,9 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import android.net.Uri
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.auth.UserProfileChangeRequest
 
 sealed class AuthState {
     object Idle : AuthState()
@@ -114,6 +117,42 @@ class AuthViewModel : ViewModel() {
                 _authState.value = AuthState.Error(task.exception?.message ?: "Failed to send verification email")
             }
         }
+    }
+
+    fun uploadProfilePhoto(uri: Uri) {
+        val user = auth.currentUser
+        if (user == null) {
+            _authState.value = AuthState.Error("User not logged in")
+            return
+        }
+
+        _authState.value = AuthState.Loading
+
+        val storageRef = FirebaseStorage.getInstance().reference
+        val profileImageRef = storageRef.child("profile_images/${user.uid}.jpg")
+
+        profileImageRef.putFile(uri)
+            .addOnSuccessListener {
+                profileImageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setPhotoUri(downloadUrl)
+                        .build()
+
+                    user.updateProfile(profileUpdates)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                _authState.value = AuthState.Success
+                            } else {
+                                _authState.value = AuthState.Error(task.exception?.message ?: "Failed to update profile")
+                            }
+                        }
+                }.addOnFailureListener { e ->
+                    _authState.value = AuthState.Error(e.message ?: "Failed to get download URL")
+                }
+            }
+            .addOnFailureListener { e ->
+                _authState.value = AuthState.Error(e.message ?: "Failed to upload image")
+            }
     }
     
     fun resetState() {

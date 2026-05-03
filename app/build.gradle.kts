@@ -55,6 +55,8 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
+    implementation(libs.coil.compose)
     
     // Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.8.3")
