@@ -33,6 +33,10 @@ import com.example.plantcare.ui.theme.PrimaryGreen
 import com.example.plantcare.ui.theme.SurfaceLightGreen
 import com.example.plantcare.ui.theme.TextGray
 import com.example.plantcare.ui.settings.ChangeEmailModal
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.plantcare.ui.login.AuthViewModel
+import com.example.plantcare.ui.login.AuthState
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +45,8 @@ fun ProfileScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToPlants: () -> Unit = {},
     onNavigateToCalendar: () -> Unit = {},
-    onLogout: () -> Unit = {}
+    onLogout: () -> Unit = {},
+    authViewModel: AuthViewModel = viewModel()
 ) {
     val backgroundColor = MaterialTheme.colorScheme.background
     val textDarkGreen = MaterialTheme.colorScheme.onBackground
@@ -54,24 +59,43 @@ fun ProfileScreen(
     var showChangeEmailModal by remember { mutableStateOf(false) }
     var showAppearanceModal by remember { mutableStateOf(false) }
 
+    val authState by authViewModel.authState.collectAsState()
+    val currentUserEmail = remember { FirebaseAuth.getInstance().currentUser?.email ?: "Unknown" }
+
+    // Reset auth state when modals close
+    LaunchedEffect(showChangePasswordModal, showChangeEmailModal) {
+        if (!showChangePasswordModal && !showChangeEmailModal) {
+            authViewModel.resetState()
+        }
+    }
+
     if (showAccountSettingsModal) {
         AccountSettingsModal(
             onDismiss = { showAccountSettingsModal = false },
             onChangePasswordClick = { showChangePasswordModal = true },
-            onChangeEmailClick = { showChangeEmailModal = true }
+            onChangeEmailClick = { showChangeEmailModal = true },
+            currentUserEmail = currentUserEmail
         )
     }
 
     if (showChangePasswordModal) {
-        ChangePasswordModal(onDismiss = { showChangePasswordModal = false })
+        ChangePasswordModal(
+            onDismiss = { showChangePasswordModal = false },
+            onSavePassword = { current, newPass, confirm ->
+                authViewModel.changePassword(current, newPass, confirm)
+            },
+            authState = authState
+        )
     }
 
     if (showChangeEmailModal) {
         ChangeEmailModal(
             onDismiss = { showChangeEmailModal = false },
             onSaveEmail = { newEmail, confirmEmail ->
-                showChangeEmailModal = false
-            }
+                authViewModel.changeEmail(newEmail, confirmEmail)
+            },
+            currentEmail = currentUserEmail,
+            authState = authState
         )
     }
 
@@ -162,7 +186,7 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(16.dp))
             
             Text(text = "Alex Carter", color = textDarkGreen, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
-            Text(text = "alex.carter@botanical.com", color = textGray, fontSize = 14.sp)
+            Text(text = currentUserEmail, color = textGray, fontSize = 14.sp)
             
             Spacer(modifier = Modifier.height(32.dp))
             
@@ -298,7 +322,8 @@ fun SettingsItemWithToggle(
 fun AccountSettingsModal(
     onDismiss: () -> Unit, 
     onChangePasswordClick: () -> Unit,
-    onChangeEmailClick: () -> Unit
+    onChangeEmailClick: () -> Unit,
+    currentUserEmail: String
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -310,7 +335,7 @@ fun AccountSettingsModal(
                 .wrapContentHeight()
                 .heightIn(max = 700.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFFF8FAF8))
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Header
@@ -325,10 +350,10 @@ fun AccountSettingsModal(
                         text = "Account Settings",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2D6A4F)
+                        color = MaterialTheme.colorScheme.primary
                     )
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF2D6A4F))
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.primary)
                     }
                 }
                 
@@ -344,7 +369,7 @@ fun AccountSettingsModal(
                     Spacer(modifier = Modifier.height(12.dp))
                     InfoRow(label = "FULL NAME", value = "Alex Carter", onClick = {})
                     Spacer(modifier = Modifier.height(12.dp))
-                    InfoRow(label = "EMAIL", value = "j.green@botanica.com", onClick = onChangeEmailClick)
+                    InfoRow(label = "EMAIL", value = currentUserEmail, onClick = onChangeEmailClick)
                     
                     Spacer(modifier = Modifier.height(32.dp))
                     
@@ -377,7 +402,7 @@ fun AccountSettingsModal(
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D6A4F))
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text(text = "Save Changes", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
@@ -393,7 +418,7 @@ fun SectionTitle(title: String) {
         text = title,
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF0F5238).copy(alpha = 0.6f),
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
         letterSpacing = 1.2.sp
     )
 }
@@ -403,7 +428,7 @@ fun InfoRow(label: String, value: String, onClick: (() -> Unit)? = null) {
     val modifier = Modifier
         .fillMaxWidth()
         .clip(RoundedCornerShape(16.dp))
-        .background(Color(0xFFE9F0E7))
+        .background(MaterialTheme.colorScheme.surfaceVariant)
         .let { if (onClick != null) it.clickable(onClick = onClick) else it }
         .padding(16.dp)
 
@@ -413,11 +438,11 @@ fun InfoRow(label: String, value: String, onClick: (() -> Unit)? = null) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(text = label, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF0F5238).copy(alpha = 0.6f))
+            Text(text = label, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = value, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF2D6A4F))
+            Text(text = value, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         }
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.LightGray)
+        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -435,15 +460,15 @@ fun ActionRow(icon: ImageVector, title: String, onClick: () -> Unit = {}) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier.size(40.dp).background(Color.White, CircleShape),
+                modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.surface, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, contentDescription = null, tint = Color(0xFF2D6A4F), modifier = Modifier.size(20.dp))
+                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF2D6A4F))
+            Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         }
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.LightGray)
+        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -453,7 +478,7 @@ fun ActionRowWithSubtitle(icon: ImageVector, title: String, subtitle: String, on
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFE9F0E7))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -461,24 +486,28 @@ fun ActionRowWithSubtitle(icon: ImageVector, title: String, subtitle: String, on
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
-                modifier = Modifier.size(40.dp).background(Color.White, CircleShape),
+                modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.surface, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, contentDescription = null, tint = Color(0xFF2D6A4F), modifier = Modifier.size(20.dp))
+                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF2D6A4F), lineHeight = 20.sp)
-                Text(text = subtitle, fontSize = 10.sp, fontWeight = FontWeight.Medium, color = Color(0xFF047857).copy(alpha = 0.7f))
+                Text(text = title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface, lineHeight = 20.sp)
+                Text(text = subtitle, fontSize = 10.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f))
             }
         }
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.LightGray)
+        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChangePasswordModal(onDismiss: () -> Unit) {
+fun ChangePasswordModal(
+    onDismiss: () -> Unit,
+    onSavePassword: (String, String, String) -> Unit,
+    authState: AuthState
+) {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -486,6 +515,12 @@ fun ChangePasswordModal(onDismiss: () -> Unit) {
     var currentPasswordVisible by remember { mutableStateOf(false) }
     var newPasswordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            onDismiss()
+        }
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -497,7 +532,7 @@ fun ChangePasswordModal(onDismiss: () -> Unit) {
                 .wrapContentHeight() // Fixes empty space bug
                 .heightIn(max = 700.dp) // Limits max height on small screens
                 .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFFF8FAF8))
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 // Header
@@ -512,15 +547,15 @@ fun ChangePasswordModal(onDismiss: () -> Unit) {
                         text = "Change Password",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF0F5238)
+                        color = MaterialTheme.colorScheme.primary
                     )
                     IconButton(
                         onClick = onDismiss,
                         modifier = Modifier
-                            .background(Color(0xFFE9F0E7), CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
                             .size(36.dp)
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF0F5238), modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                     }
                 }
 
@@ -575,28 +610,38 @@ fun ChangePasswordModal(onDismiss: () -> Unit) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White)
-                            .border(1.dp, Color(0xFFE9F0E7), RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                            .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
                             .padding(16.dp),
                         verticalAlignment = Alignment.Top
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = "Info",
-                            tint = Color(0xFF2D6A4F),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp).padding(top = 2.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text(text = "Security Requirements", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF0F5238))
+                            Text(text = "Security Requirements", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 text = "Your password must be at least 8 characters long and include a mix of letters and numbers for better atelier security.",
                                 fontSize = 12.sp,
-                                color = Color(0xFF404943),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 lineHeight = 18.sp
                             )
                         }
+                    }
+                    
+                    
+                    if (authState is AuthState.Error) {
+                        Text(
+                            text = (authState as AuthState.Error).message,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                     }
                     
                     Spacer(modifier = Modifier.height(32.dp))
@@ -609,14 +654,19 @@ fun ChangePasswordModal(onDismiss: () -> Unit) {
                         .padding(start = 24.dp, end = 24.dp, bottom = 24.dp, top = 8.dp)
                 ) {
                     Button(
-                        onClick = onDismiss,
+                        onClick = { onSavePassword(currentPassword, newPassword, confirmPassword) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2D6A4F))
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        enabled = authState !is AuthState.Loading
                     ) {
-                        Text(text = "Update Password", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        if (authState is AuthState.Loading) {
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                        } else {
+                            Text(text = "Update Password", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        }
                     }
                 }
             }
@@ -636,14 +686,14 @@ fun PasswordTextField(
     TextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = { Text(text = placeholder, color = Color(0xFF9E9E9E), fontSize = 14.sp) },
+        placeholder = { Text(text = placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha=0.6f), fontSize = 14.sp) },
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp)),
         colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color(0xFFF1F4F1),
-            focusedContainerColor = Color(0xFFF1F4F1),
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
@@ -654,7 +704,7 @@ fun PasswordTextField(
                 Icon(
                     imageVector = if (isVisible) Icons.Outlined.Visibility else Icons.Outlined.VisibilityOff,
                     contentDescription = if (isVisible) "Hide password" else "Show password",
-                    tint = Color(0xFF625B71)
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

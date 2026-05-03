@@ -52,6 +52,70 @@ class AuthViewModel : ViewModel() {
             }
     }
     
+    fun changePassword(currentPass: String, newPass: String, confirmPass: String) {
+        if (newPass != confirmPass) {
+            _authState.value = AuthState.Error("New passwords do not match")
+            return
+        }
+        if (currentPass.isBlank() || newPass.isBlank()) {
+            _authState.value = AuthState.Error("Fields cannot be empty")
+            return
+        }
+        
+        val user = auth.currentUser
+        if (user == null || user.email == null) {
+            _authState.value = AuthState.Error("User not logged in")
+            return
+        }
+
+        _authState.value = AuthState.Loading
+        
+        // Re-authenticate first
+        val credential = com.google.firebase.auth.EmailAuthProvider.getCredential(user.email!!, currentPass)
+        user.reauthenticate(credential).addOnCompleteListener { reauthTask ->
+            if (reauthTask.isSuccessful) {
+                user.updatePassword(newPass).addOnCompleteListener { updateTask ->
+                    if (updateTask.isSuccessful) {
+                        _authState.value = AuthState.Success
+                    } else {
+                        _authState.value = AuthState.Error(updateTask.exception?.message ?: "Failed to update password")
+                    }
+                }
+            } else {
+                _authState.value = AuthState.Error(reauthTask.exception?.message ?: "Re-authentication failed. Incorrect current password.")
+            }
+        }
+    }
+
+    fun changeEmail(newEmail: String, confirmEmail: String) {
+        if (newEmail != confirmEmail) {
+            _authState.value = AuthState.Error("Emails do not match")
+            return
+        }
+        if (newEmail.isBlank()) {
+            _authState.value = AuthState.Error("Email cannot be empty")
+            return
+        }
+
+        val user = auth.currentUser
+        if (user == null) {
+            _authState.value = AuthState.Error("User not logged in")
+            return
+        }
+
+        _authState.value = AuthState.Loading
+        
+        // Firebase highly recommends verifying the new email before updating
+        user.verifyBeforeUpdateEmail(newEmail).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                _authState.value = AuthState.Success
+            } else {
+                // If it fails due to recent login required, we show the error
+                _authState.value = AuthState.Error(task.exception?.message ?: "Failed to send verification email")
+            }
+        }
+    }
+    
     fun resetState() {
         _authState.value = AuthState.Idle
     }

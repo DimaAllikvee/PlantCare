@@ -1,5 +1,7 @@
 package com.example.plantcare.ui.settings
 
+import com.example.plantcare.ui.login.AuthState
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,10 +23,18 @@ import com.example.plantcare.ui.theme.TextGray
 @Composable
 fun ChangeEmailModal(
     onDismiss: () -> Unit,
-    onSaveEmail: (String, String) -> Unit
+    onSaveEmail: (String, String) -> Unit,
+    currentEmail: String,
+    authState: AuthState
 ) {
     var newEmail by remember { mutableStateOf("") }
     var confirmEmail by remember { mutableStateOf("") }
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            onDismiss()
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -61,7 +71,7 @@ fun ChangeEmailModal(
             // Current Email (Read-Only)
             SettingsInputField(
                 label = "Current Email",
-                value = "alex.carter@example.com", // Stub value
+                value = currentEmail,
                 onValueChange = {},
                 readOnly = true,
                 placeholder = ""
@@ -97,6 +107,16 @@ fun ChangeEmailModal(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            if (authState is AuthState.Error) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = (authState as AuthState.Error).message,
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 14.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
 
             // Action Button
@@ -106,14 +126,19 @@ fun ChangeEmailModal(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                enabled = authState !is AuthState.Loading
             ) {
-                Text(
-                    text = "Update Email",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White
-                )
+                if (authState is AuthState.Loading) {
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                } else {
+                    Text(
+                        text = "Update Email",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.height(16.dp))
