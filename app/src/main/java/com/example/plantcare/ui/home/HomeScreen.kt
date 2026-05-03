@@ -21,11 +21,9 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import com.example.plantcare.ui.navigation.PlantCareBottomNavigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,45 +48,22 @@ import com.example.plantcare.ui.theme.TextGray
 fun HomeScreen(
     onNavigateToPlants: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToCalendar: () -> Unit = {},
     plantViewModel: PlantViewModel
 ) {
     val plants by plantViewModel.plants.collectAsState()
-    
-    var selectedItem by remember { mutableStateOf(0) }
-    val items = listOf("Home", "Calendar", "Plants", "Profile")
-    val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist, Icons.Filled.Person)
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { if (plants.isEmpty()) 1 else plants.size })
 
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                containerColor = SurfaceLightGreen,
-                contentColor = PrimaryGreen
-            ) {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = { Icon(icons[index], contentDescription = item) },
-                        label = { Text(item, fontWeight = FontWeight.Medium) },
-                        selected = selectedItem == index,
-                        onClick = { 
-                            selectedItem = index
-                            if (index == 2) {
-                                onNavigateToPlants()
-                            } else if (index == 3) {
-                                onNavigateToProfile()
-                            }
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = PrimaryGreen,
-                            selectedTextColor = PrimaryGreen,
-                            indicatorColor = PrimaryGreen.copy(alpha = 0.2f),
-                            unselectedIconColor = TextGray,
-                            unselectedTextColor = TextGray
-                        )
-                    )
-                }
-            }
+            PlantCareBottomNavigation(
+                currentRoute = "home",
+                onNavigateToHome = { /* Already here */ },
+                onNavigateToCalendar = onNavigateToCalendar,
+                onNavigateToPlants = onNavigateToPlants,
+                onNavigateToProfile = onNavigateToProfile
+            )
         }
     ) { paddingValues ->
         Box(

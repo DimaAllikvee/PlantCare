@@ -30,7 +30,15 @@ class PlantViewModel : ViewModel() {
         fetchPlants()
     }
 
-    fun addPlant(name: String, species: String, interval: String, sunlight: String, imageUrl: String) {
+    fun addPlant(
+        name: String, 
+        species: String, 
+        interval: String, 
+        mistingInterval: String, 
+        fertilizingInterval: String, 
+        sunlight: String, 
+        imageUrl: String
+    ) {
         val user = auth.currentUser
         if (user == null) {
             _plantState.value = PlantState.Error("User not logged in")
@@ -49,6 +57,8 @@ class PlantViewModel : ViewModel() {
             name = name,
             species = species,
             wateringInterval = interval,
+            mistingInterval = mistingInterval,
+            fertilizingInterval = fertilizingInterval,
             sunlightNeeds = sunlight,
             imageUrl = imageUrl,
             userId = user.uid
@@ -79,13 +89,65 @@ class PlantViewModel : ViewModel() {
     }
 
     fun markPlantWatered(plantId: String) {
+        val updates = mapOf(
+            "lastWatered" to System.currentTimeMillis(),
+            "nextWateringOverride" to null
+        )
         db.collection("plants").document(plantId)
-            .update("lastWatered", System.currentTimeMillis())
+            .update(updates)
             .addOnSuccessListener {
                 fetchPlants() // refresh the list to reflect updated moisture
             }
             .addOnFailureListener { e ->
                 _plantState.value = PlantState.Error(e.message ?: "Error updating plant")
+            }
+    }
+
+    fun markPlantMisted(plantId: String) {
+        val updates = mapOf(
+            "lastMisted" to System.currentTimeMillis(),
+            "nextMistingOverride" to null
+        )
+        db.collection("plants").document(plantId)
+            .update(updates)
+            .addOnSuccessListener {
+                fetchPlants()
+            }
+            .addOnFailureListener { e ->
+                _plantState.value = PlantState.Error(e.message ?: "Error updating plant")
+            }
+    }
+
+    fun markPlantFertilized(plantId: String) {
+        val updates = mapOf(
+            "lastFertilized" to System.currentTimeMillis(),
+            "nextFertilizingOverride" to null
+        )
+        db.collection("plants").document(plantId)
+            .update(updates)
+            .addOnSuccessListener {
+                fetchPlants()
+            }
+            .addOnFailureListener { e ->
+                _plantState.value = PlantState.Error(e.message ?: "Error updating plant")
+            }
+    }
+    
+    fun rescheduleTask(plantId: String, taskType: String, newDateMillis: Long) {
+        val fieldToUpdate = when (taskType) {
+            "Watering" -> "nextWateringOverride"
+            "Misting" -> "nextMistingOverride"
+            "Fertilizing" -> "nextFertilizingOverride"
+            else -> return
+        }
+        
+        db.collection("plants").document(plantId)
+            .update(fieldToUpdate, newDateMillis)
+            .addOnSuccessListener {
+                fetchPlants()
+            }
+            .addOnFailureListener { e ->
+                _plantState.value = PlantState.Error(e.message ?: "Error rescheduling task")
             }
     }
 

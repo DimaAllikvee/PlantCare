@@ -59,6 +59,9 @@ fun AppNavigation() {
                 onNavigateToProfile = {
                     navController.navigate(Screen.Profile.route)
                 },
+                onNavigateToCalendar = {
+                    navController.navigate(Screen.Calendar.route)
+                },
                 plantViewModel = sharedPlantViewModel
             )
         }
@@ -69,6 +72,9 @@ fun AppNavigation() {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }
+                },
+                onNavigateToCalendar = {
+                    navController.navigate(Screen.Calendar.route)
                 },
                 onNavigateToAddNewPlant = {
                     navController.navigate(Screen.AddNewPlant.route)
@@ -118,11 +124,27 @@ fun AppNavigation() {
                         popUpTo(Screen.Home.route) { inclusive = false }
                     }
                 },
+                onNavigateToCalendar = {
+                    navController.navigate(Screen.Calendar.route)
+                },
                 onLogout = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0) { inclusive = true }
                     }
                 }
+            )
+        }
+        
+        composable(Screen.Calendar.route) {
+            com.example.plantcare.ui.calendar.CareCalendarScreen(
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onNavigateToPlants = { navController.navigate(Screen.MyPlants.route) },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
+                plantViewModel = sharedPlantViewModel
             )
         }
     }

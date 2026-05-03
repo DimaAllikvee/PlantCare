@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.*
+import com.example.plantcare.ui.navigation.PlantCareBottomNavigation
 import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.plantcare.ui.myplants.PlantViewModel
@@ -42,6 +43,7 @@ fun MyPlantsScreen(
     onNavigateToAddNewPlant: () -> Unit = {},
     onNavigateToPlantDetail: (String) -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToCalendar: () -> Unit = {},
     plantViewModel: PlantViewModel = viewModel()
 ) {
     val plants by plantViewModel.plants.collectAsState()
@@ -51,40 +53,17 @@ fun MyPlantsScreen(
         plantViewModel.fetchPlants()
     }
 
-    var selectedItem by remember { mutableStateOf(2) }
     var searchQuery by remember { mutableStateOf("") }
-    val items = listOf("Home", "Calendar", "Plants", "Profile")
-    val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist, Icons.Filled.Person)
 
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                containerColor = SurfaceLightGreen,
-                contentColor = PrimaryGreen
-            ) {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = { Icon(icons[index], contentDescription = item) },
-                        label = { Text(item, fontWeight = FontWeight.Medium) },
-                        selected = selectedItem == index,
-                        onClick = { 
-                            selectedItem = index
-                            if (index == 0) {
-                                onNavigateToHome()
-                            } else if (index == 3) {
-                                onNavigateToProfile()
-                            }
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = PrimaryGreen,
-                            selectedTextColor = PrimaryGreen,
-                            indicatorColor = PrimaryGreen.copy(alpha = 0.2f),
-                            unselectedIconColor = TextGray,
-                            unselectedTextColor = TextGray
-                        )
-                    )
-                }
-            }
+            PlantCareBottomNavigation(
+                currentRoute = "my_plants",
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToCalendar = onNavigateToCalendar,
+                onNavigateToPlants = { /* Already here */ },
+                onNavigateToProfile = onNavigateToProfile
+            )
         }
     ) { paddingValues ->
         Column(

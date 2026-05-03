@@ -42,9 +42,17 @@ fun AddNewPlantScreen(
     var plantName by remember { mutableStateOf("") }
     var plantSpecies by remember { mutableStateOf("") }
     var wateringInterval by remember { mutableStateOf("") }
+    var mistingInterval by remember { mutableStateOf("None") }
+    var fertilizingInterval by remember { mutableStateOf("None") }
     var selectedSunlight by remember { mutableStateOf("Medium") }
-    var expanded by remember { mutableStateOf(false) }
-    val intervalOptions = listOf("Every 1 day", "Every 2 days", "Every 3 days", "Every 5 days", "Every 7 days", "Every 14 days")
+    
+    var expandedWatering by remember { mutableStateOf(false) }
+    var expandedMisting by remember { mutableStateOf(false) }
+    var expandedFertilizing by remember { mutableStateOf(false) }
+    
+    val wateringOptions = listOf("Every 1 day", "Every 2 days", "Every 3 days", "Every 5 days", "Every 7 days", "Every 14 days")
+    val mistingOptions = listOf("None", "Every 1 day", "Every 2 days", "Every 3 days", "Every 7 days")
+    val fertilizingOptions = listOf("None", "Every 7 days", "Every 14 days", "Every 30 days")
 
     Scaffold(
         topBar = {
@@ -88,9 +96,11 @@ fun AddNewPlantScreen(
                             plantViewModel.addPlant(
                                 name = plantName,
                                 species = plantSpecies,
-                                interval = wateringInterval.ifEmpty { "Every 7 days" }, // default if missed typing
+                                interval = wateringInterval.ifEmpty { "Every 7 days" },
+                                mistingInterval = mistingInterval,
+                                fertilizingInterval = fertilizingInterval,
                                 sunlight = selectedSunlight,
-                                imageUrl = "" // Fallback to empty string for default photo logic
+                                imageUrl = ""
                             )
                         },
                         modifier = Modifier
@@ -172,15 +182,15 @@ fun AddNewPlantScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
+                expanded = expandedWatering,
+                onExpandedChange = { expandedWatering = !expandedWatering }
             ) {
                 PlantInputField(
                     label = "Watering Interval",
                     value = wateringInterval.ifEmpty { "Every 7 days" },
                     onValueChange = {},
                     placeholder = "Every 7 days",
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedWatering) },
                     readOnly = true,
                     textFieldModifier = Modifier
                         .menuAnchor()
@@ -189,16 +199,88 @@ fun AddNewPlantScreen(
                 )
 
                 ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
+                    expanded = expandedWatering,
+                    onDismissRequest = { expandedWatering = false },
                     modifier = Modifier.background(CardBackground)
                 ) {
-                    intervalOptions.forEach { selectionOption ->
+                    wateringOptions.forEach { selectionOption ->
                         DropdownMenuItem(
                             text = { Text(selectionOption, color = PrimaryGreen) },
                             onClick = {
                                 wateringInterval = selectionOption
-                                expanded = false
+                                expandedWatering = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            ExposedDropdownMenuBox(
+                expanded = expandedMisting,
+                onExpandedChange = { expandedMisting = !expandedMisting }
+            ) {
+                PlantInputField(
+                    label = "Misting Interval",
+                    value = mistingInterval,
+                    onValueChange = {},
+                    placeholder = "None",
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedMisting) },
+                    readOnly = true,
+                    textFieldModifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .height(56.dp)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedMisting,
+                    onDismissRequest = { expandedMisting = false },
+                    modifier = Modifier.background(CardBackground)
+                ) {
+                    mistingOptions.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption, color = PrimaryGreen) },
+                            onClick = {
+                                mistingInterval = selectionOption
+                                expandedMisting = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            ExposedDropdownMenuBox(
+                expanded = expandedFertilizing,
+                onExpandedChange = { expandedFertilizing = !expandedFertilizing }
+            ) {
+                PlantInputField(
+                    label = "Fertilizing Interval",
+                    value = fertilizingInterval,
+                    onValueChange = {},
+                    placeholder = "None",
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedFertilizing) },
+                    readOnly = true,
+                    textFieldModifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .height(56.dp)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedFertilizing,
+                    onDismissRequest = { expandedFertilizing = false },
+                    modifier = Modifier.background(CardBackground)
+                ) {
+                    fertilizingOptions.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption, color = PrimaryGreen) },
+                            onClick = {
+                                fertilizingInterval = selectionOption
+                                expandedFertilizing = false
                             }
                         )
                     }

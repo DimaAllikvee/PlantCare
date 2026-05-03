@@ -24,9 +24,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.plantcare.ui.navigation.PlantCareBottomNavigation
 import com.example.plantcare.ui.theme.PrimaryGreen
 import com.example.plantcare.ui.theme.SurfaceLightGreen
 import com.example.plantcare.ui.theme.TextGray
+import com.example.plantcare.ui.settings.ChangeEmailModal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +36,7 @@ fun ProfileScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToHome: () -> Unit = {},
     onNavigateToPlants: () -> Unit = {},
+    onNavigateToCalendar: () -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
     val backgroundColor = Color(0xFFF8F9FB)
@@ -44,17 +47,28 @@ fun ProfileScreen(
     
     var showAccountSettingsModal by remember { mutableStateOf(false) }
     var showChangePasswordModal by remember { mutableStateOf(false) }
+    var showChangeEmailModal by remember { mutableStateOf(false) }
     var showAppearanceModal by remember { mutableStateOf(false) }
 
     if (showAccountSettingsModal) {
         AccountSettingsModal(
             onDismiss = { showAccountSettingsModal = false },
-            onChangePasswordClick = { showChangePasswordModal = true }
+            onChangePasswordClick = { showChangePasswordModal = true },
+            onChangeEmailClick = { showChangeEmailModal = true }
         )
     }
 
     if (showChangePasswordModal) {
         ChangePasswordModal(onDismiss = { showChangePasswordModal = false })
+    }
+
+    if (showChangeEmailModal) {
+        ChangeEmailModal(
+            onDismiss = { showChangeEmailModal = false },
+            onSaveEmail = { newEmail, confirmEmail ->
+                showChangeEmailModal = false
+            }
+        )
     }
 
     if (showAppearanceModal) {
@@ -84,9 +98,12 @@ fun ProfileScreen(
             )
         },
         bottomBar = {
-            ProfileBottomNavigationBar(
+            PlantCareBottomNavigation(
+                currentRoute = "profile",
                 onNavigateToHome = onNavigateToHome,
-                onNavigateToPlants = onNavigateToPlants
+                onNavigateToCalendar = onNavigateToCalendar,
+                onNavigateToPlants = onNavigateToPlants,
+                onNavigateToProfile = { /* Already here */ }
             )
         }
     ) { paddingValues ->
@@ -271,42 +288,14 @@ fun SettingsItemWithToggle(
     }
 }
 
+
+
 @Composable
-fun ProfileBottomNavigationBar(
-    onNavigateToHome: () -> Unit,
-    onNavigateToPlants: () -> Unit
+fun AccountSettingsModal(
+    onDismiss: () -> Unit, 
+    onChangePasswordClick: () -> Unit,
+    onChangeEmailClick: () -> Unit
 ) {
-    val items = listOf("Home", "Calendar", "Plants", "Profile")
-    val icons = listOf(Icons.Filled.Home, Icons.Filled.DateRange, Icons.Filled.LocalFlorist, Icons.Filled.Person)
-    // Removed local color declarations; will use imported ones
-
-    NavigationBar(
-        containerColor = SurfaceLightGreen,
-        contentColor = PrimaryGreen
-    ) {
-        items.forEachIndexed { index, item ->
-            NavigationBarItem(
-                icon = { Icon(icons[index], contentDescription = item) },
-                label = { Text(item, fontWeight = FontWeight.Medium) },
-                selected = index == 3, // Profile is the 4th item
-                onClick = { 
-                    if (index == 0) onNavigateToHome()
-                    if (index == 2) onNavigateToPlants()
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PrimaryGreen,
-                    selectedTextColor = PrimaryGreen,
-                    indicatorColor = PrimaryGreen.copy(alpha = 0.2f),
-                    unselectedIconColor = TextGray,
-                    unselectedTextColor = TextGray
-                )
-            )
-        }
-    }
-}
-
-@Composable
-fun AccountSettingsModal(onDismiss: () -> Unit, onChangePasswordClick: () -> Unit) {
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false) // to allow custom width
@@ -349,9 +338,9 @@ fun AccountSettingsModal(onDismiss: () -> Unit, onChangePasswordClick: () -> Uni
                     // Personal Information
                     SectionTitle("PERSONAL INFORMATION")
                     Spacer(modifier = Modifier.height(12.dp))
-                    InfoRow(label = "FULL NAME", value = "Alex Carter")
+                    InfoRow(label = "FULL NAME", value = "Alex Carter", onClick = {})
                     Spacer(modifier = Modifier.height(12.dp))
-                    InfoRow(label = "EMAIL", value = "j.green@botanica.com")
+                    InfoRow(label = "EMAIL", value = "j.green@botanica.com", onClick = onChangeEmailClick)
                     
                     Spacer(modifier = Modifier.height(32.dp))
                     
@@ -406,13 +395,16 @@ fun SectionTitle(title: String) {
 }
 
 @Composable
-fun InfoRow(label: String, value: String) {
+fun InfoRow(label: String, value: String, onClick: (() -> Unit)? = null) {
+    val modifier = Modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(16.dp))
+        .background(Color(0xFFE9F0E7))
+        .let { if (onClick != null) it.clickable(onClick = onClick) else it }
+        .padding(16.dp)
+
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFE9F0E7))
-            .padding(16.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
