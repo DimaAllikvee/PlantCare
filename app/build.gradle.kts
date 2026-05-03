@@ -58,6 +58,11 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.coil.compose)
     
+    // Networking (Retrofit + OkHttp)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp)
+    
     // Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.8.3")
     // ViewModel Compose

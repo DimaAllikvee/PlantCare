@@ -31,17 +31,27 @@ import com.example.plantcare.ui.theme.CardBackground
 import com.example.plantcare.ui.theme.PrimaryGreen
 import com.example.plantcare.ui.theme.SurfaceLightGreen
 import com.example.plantcare.ui.theme.TextGray
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNewPlantScreen(
     plantId: String? = null,
     onNavigateBack: () -> Unit = {},
-    plantViewModel: PlantViewModel = viewModel()
+    plantViewModel: PlantViewModel = viewModel(),
+    catalogViewModel: PlantCatalogViewModel = viewModel()
 ) {
     val plantState by plantViewModel.plantState.collectAsState()
     val plants by plantViewModel.plants.collectAsState()
     val isEditMode = plantId != null
+
+    val searchResults by catalogViewModel.searchResults.collectAsState()
+    val isSearching by catalogViewModel.isSearching.collectAsState()
+    val selectedDetails by catalogViewModel.selectedPlantDetails.collectAsState()
+    val isLoadingDetails by catalogViewModel.isLoadingDetails.collectAsState()
 
     var plantName by remember { mutableStateOf("") }
     var plantSpecies by remember { mutableStateOf("") }
@@ -49,6 +59,8 @@ fun AddNewPlantScreen(
     var mistingInterval by remember { mutableStateOf("None") }
     var fertilizingInterval by remember { mutableStateOf("None") }
     var selectedSunlight by remember { mutableStateOf("Medium") }
+    var selectedImageUrl by remember { mutableStateOf("") }
+    var showSuggestions by remember { mutableStateOf(false) }
     
     LaunchedEffect(plantId, plants) {
         if (isEditMode) {
@@ -60,7 +72,23 @@ fun AddNewPlantScreen(
                 mistingInterval = existingPlant.mistingInterval
                 fertilizingInterval = existingPlant.fertilizingInterval
                 selectedSunlight = existingPlant.sunlightNeeds
+                selectedImageUrl = existingPlant.imageUrl
             }
+        }
+    }
+
+    // Auto-fill when details arrive from API
+    LaunchedEffect(selectedDetails) {
+        selectedDetails?.let { details ->
+            details.commonName?.let { plantSpecies = it }
+            selectedSunlight = catalogViewModel.mapSunlight(details.sunlight)
+            val interval = catalogViewModel.mapWateringToInterval(
+                details.watering,
+                details.wateringBenchmark?.value
+            )
+            wateringInterval = interval
+            details.defaultImage?.regularUrl?.let { selectedImageUrl = it }
+            catalogViewModel.clearSelectedDetails()
         }
     }
     
@@ -120,7 +148,7 @@ fun AddNewPlantScreen(
                                     mistingInterval = mistingInterval,
                                     fertilizingInterval = fertilizingInterval,
                                     sunlight = selectedSunlight,
-                                    imageUrl = ""
+                                    imageUrl = selectedImageUrl
                                 )
                             } else {
                                 plantViewModel.addPlant(
@@ -130,7 +158,7 @@ fun AddNewPlantScreen(
                                     mistingInterval = mistingInterval,
                                     fertilizingInterval = fertilizingInterval,
                                     sunlight = selectedSunlight,
-                                    imageUrl = ""
+                                    imageUrl = selectedImageUrl
                                 )
                             }
                         },
@@ -205,10 +233,134 @@ fun AddNewPlantScreen(
             PlantInputField(
                 label = "Plant Species",
                 value = plantSpecies,
-                onValueChange = { plantSpecies = it },
+                onValueChange = { 
+                    plantSpecies = it
+                    showSuggestions = true
+                    catalogViewModel.searchSpecies(it)
+                },
                 placeholder = "Search species...",
                 leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search", tint = TextGray) }
             )
+
+            // Search Suggestions Dropdown
+            if (showSuggestions && (searchResults.isNotEmpty() || isSearching)) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 250.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    if (isSearching) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = PrimaryGreen,
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp
+                            )
+                        }
+                    } else {
+                        LazyColumn {
+                            items(searchResults) { species ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            plantSpecies = species.commonName ?: ""
+                                            showSuggestions = false
+                                            catalogViewModel.clearSearch()
+                                            // Fetch full details for auto-fill
+                                            catalogViewModel.getPlantDetails(species.id)
+                                        }
+                                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Thumbnail
+                                    val thumbUrl = species.defaultImage?.thumbnail
+                                        ?: species.defaultImage?.smallUrl
+                                    if (thumbUrl != null) {
+                                        AsyncImage(
+                                            model = thumbUrl,
+                                            contentDescription = species.commonName,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier
+                                                .size(44.dp)
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(SurfaceLightGreen)
+                                        )
+                                    } else {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(44.dp)
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(SurfaceLightGreen),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text("🌱", fontSize = 20.sp)
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = species.commonName ?: "Unknown",
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 14.sp,
+                                            color = PrimaryGreen,
+                                            maxLines = 1
+                                        )
+                                        val sciName = species.scientificName?.firstOrNull()
+                                        if (sciName != null) {
+                                            Text(
+                                                text = sciName,
+                                                fontSize = 11.sp,
+                                                color = TextGray,
+                                                maxLines = 1
+                                            )
+                                        }
+                                    }
+
+                                    // Watering badge
+                                    species.watering?.let { watering ->
+                                        Text(
+                                            text = watering,
+                                            fontSize = 10.sp,
+                                            color = PrimaryGreen,
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier
+                                                .background(SurfaceLightGreen, RoundedCornerShape(6.dp))
+                                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Loading details indicator
+            if (isLoadingDetails) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator(color = PrimaryGreen, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Auto-filling plant data...", fontSize = 12.sp, color = TextGray)
+                }
+            }
 
             Spacer(modifier = Modifier.height(20.dp))
 
