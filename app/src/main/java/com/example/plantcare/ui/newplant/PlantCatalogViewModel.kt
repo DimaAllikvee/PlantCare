@@ -26,6 +26,9 @@ class PlantCatalogViewModel : ViewModel() {
     private val _isLoadingDetails = MutableStateFlow(false)
     val isLoadingDetails: StateFlow<Boolean> = _isLoadingDetails.asStateFlow()
 
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+
     private var searchJob: Job? = null
 
     fun searchSpecies(query: String) {
@@ -38,11 +41,13 @@ class PlantCatalogViewModel : ViewModel() {
         searchJob = viewModelScope.launch {
             delay(400) // Debounce — wait 400ms before sending request
             _isSearching.value = true
+            _errorMessage.value = null
             try {
-                val response = RetrofitInstance.api.searchPlants(query = query)
+                val response = RetrofitInstance.api.searchPlants(query = query, indoor = 1)
                 _searchResults.value = response.data.take(10) // Limit to 10 results
             } catch (e: Exception) {
                 _searchResults.value = emptyList()
+                _errorMessage.value = "Search error: ${e.message}"
             } finally {
                 _isSearching.value = false
             }
@@ -52,11 +57,13 @@ class PlantCatalogViewModel : ViewModel() {
     fun getPlantDetails(id: Int) {
         viewModelScope.launch {
             _isLoadingDetails.value = true
+            _errorMessage.value = null
             try {
                 val details = RetrofitInstance.api.getPlantDetails(id = id)
                 _selectedPlantDetails.value = details
             } catch (e: Exception) {
                 _selectedPlantDetails.value = null
+                _errorMessage.value = "Details error: ${e.message}"
             } finally {
                 _isLoadingDetails.value = false
             }

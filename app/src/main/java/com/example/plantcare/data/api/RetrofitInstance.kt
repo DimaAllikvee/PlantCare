@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitInstance {
 
     // TODO: Move to BuildConfig for production
-    const val API_KEY = "sk-JNKL67c109c3ae0e88442"
+    const val API_KEY = "sk-4leb69f6f08be1ff616942"
 
     private const val BASE_URL = "https://perenual.com/api/v2/"
 

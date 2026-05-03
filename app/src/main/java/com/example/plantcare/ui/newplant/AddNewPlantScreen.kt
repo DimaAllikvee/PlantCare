@@ -197,7 +197,6 @@ fun AddNewPlantScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Upload Photo Section
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -206,8 +205,17 @@ fun AddNewPlantScreen(
                     .background(SurfaceLightGreen)
                     .clickable { /* Handle photo upload */ }
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Filled.CameraAlt, contentDescription = "Upload Photo", tint = PrimaryGreen, modifier = Modifier.size(32.dp))
+                if (selectedImageUrl.isNotEmpty()) {
+                    AsyncImage(
+                        model = selectedImageUrl,
+                        contentDescription = "Plant Photo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.CameraAlt, contentDescription = "Upload Photo", tint = PrimaryGreen, modifier = Modifier.size(32.dp))
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -254,7 +262,23 @@ fun AddNewPlantScreen(
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    if (isSearching) {
+                    val errorMessage by catalogViewModel.errorMessage.collectAsState()
+                    
+                    if (errorMessage != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = errorMessage!!,
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 12.sp,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+                    } else if (isSearching) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
