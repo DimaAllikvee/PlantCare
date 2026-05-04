@@ -79,6 +79,14 @@ On Saturday morning, Mark performs his weekly maintenance for his 32 indoor plan
 
 figma - https://www.figma.com/design/YExjZgzFM9L891UqobFcvF/User-Personas?node-id=0-1&t=Rzon2YKzTWBBPAbz-1
 
+## Järjestusdiagramm (Plant Care)
+<img width="1238" height="883" alt="image" src="https://github.com/user-attachments/assets/6ba7426a-ec1a-457c-84bf-817f3e082ac3" />
+
+## Plant Care (Class Diagram)
+
+<img width="1127" height="772" alt="image" src="https://github.com/user-attachments/assets/b2e4c569-950f-4531-99b0-4004e2d77a39" />
+
+
 ## How to Run
 
 
