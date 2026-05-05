@@ -210,7 +210,9 @@ fun PlantListCard(
                         model = imageUrl,
                         contentDescription = name,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.ficus_elastica),
+                        error = painterResource(id = R.drawable.ficus_elastica)
                     )
                 } else {
                     val imagePainter = painterResource(id = R.drawable.ficus_elastica)
