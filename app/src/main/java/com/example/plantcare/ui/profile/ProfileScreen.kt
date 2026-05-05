@@ -1,4 +1,4 @@
-package com.example.plantcare.ui.profile
+﻿package com.example.plantcare.ui.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,6 +41,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.plantcare.ui.login.AuthViewModel
 import com.example.plantcare.ui.login.AuthState
 import com.google.firebase.auth.FirebaseAuth
+import com.example.plantcare.ui.components.ToastMessage
+import com.example.plantcare.ui.components.ToastNotification
+import com.example.plantcare.ui.components.ToastType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +66,9 @@ fun ProfileScreen(
     var showChangePasswordModal by remember { mutableStateOf(false) }
     var showChangeEmailModal by remember { mutableStateOf(false) }
     var showAppearanceModal by remember { mutableStateOf(false) }
+    var activeToast by remember { mutableStateOf<ToastMessage?>(null) }
+    // Track what action triggered the auth state change
+    var pendingAction by remember { mutableStateOf("") }
 
     val plants by plantViewModel.plants.collectAsState()
 
@@ -85,6 +91,30 @@ fun ProfileScreen(
         }
     }
 
+    // Show toast based on authState
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.Success -> {
+                val successMsg = when (pendingAction) {
+                    "password" -> "Password updated successfully"
+                    "email" -> "Verification email sent. Please check your inbox."
+                    "photo" -> "Profile photo updated successfully"
+                    else -> "Changes saved successfully"
+                }
+                activeToast = ToastMessage(successMsg, ToastType.SUCCESS)
+                showChangePasswordModal = false
+                showChangeEmailModal = false
+                authViewModel.resetState()
+                pendingAction = ""
+            }
+            is AuthState.Error -> {
+                val errorMsg = (authState as AuthState.Error).message
+                activeToast = ToastMessage(errorMsg, ToastType.ERROR)
+            }
+            else -> {}
+        }
+    }
+
     if (showAccountSettingsModal) {
         AccountSettingsModal(
             onDismiss = { showAccountSettingsModal = false },
@@ -98,6 +128,7 @@ fun ProfileScreen(
         ChangePasswordModal(
             onDismiss = { showChangePasswordModal = false },
             onSavePassword = { current, newPass, confirm ->
+                pendingAction = "password"
                 authViewModel.changePassword(current, newPass, confirm)
             },
             authState = authState
@@ -108,6 +139,7 @@ fun ProfileScreen(
         ChangeEmailModal(
             onDismiss = { showChangeEmailModal = false },
             onSaveEmail = { newEmail, confirmEmail ->
+                pendingAction = "email"
                 authViewModel.changeEmail(newEmail, confirmEmail)
             },
             currentEmail = currentUserEmail,
@@ -119,6 +151,7 @@ fun ProfileScreen(
         AppearanceBottomSheet(onDismiss = { showAppearanceModal = false })
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         containerColor = backgroundColor,
         topBar = {
@@ -281,7 +314,14 @@ fun ProfileScreen(
             }
             Spacer(modifier = Modifier.height(32.dp))
         }
-    }
+    } // end Scaffold
+
+    // Toast overlay - shows success/error above bottom nav
+    ToastNotification(
+        toast = activeToast,
+        onDismiss = { activeToast = null }
+    )
+    } // end Box
 }
 
 @Composable
@@ -887,7 +927,14 @@ fun AppearanceBottomSheet(onDismiss: () -> Unit) {
             
             Spacer(modifier = Modifier.height(32.dp))
         }
-    }
+    } // end Scaffold
+
+    // Toast overlay - shows success/error above bottom nav
+    ToastNotification(
+        toast = activeToast,
+        onDismiss = { activeToast = null }
+    )
+    } // end Box
 }
 
 @Composable
