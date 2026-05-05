@@ -1,12 +1,19 @@
 package com.example.plantcare.ui.myplants
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import com.example.plantcare.data.Plant
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.net.URL
 import java.util.UUID
 
 sealed class PlantState {
@@ -30,6 +37,8 @@ class PlantViewModel : ViewModel() {
         fetchPlants()
     }
 
+    private val storage = FirebaseStorage.getInstance()
+
     fun addPlant(
         name: String, 
         species: String, 
@@ -52,27 +61,61 @@ class PlantViewModel : ViewModel() {
 
         _plantState.value = PlantState.Loading
         val plantId = UUID.randomUUID().toString()
-        val newPlant = Plant(
-            id = plantId,
-            name = name,
-            species = species,
-            wateringInterval = interval,
-            mistingInterval = mistingInterval,
-            fertilizingInterval = fertilizingInterval,
-            sunlightNeeds = sunlight,
-            imageUrl = imageUrl,
-            userId = user.uid
-        )
 
-        db.collection("plants").document(plantId)
-            .set(newPlant)
-            .addOnSuccessListener {
+        // Upload image to Firebase Storage for permanent URL
+        viewModelScope.launch {
+            val permanentUrl = if (imageUrl.isNotEmpty()) {
+                uploadImageToStorage(imageUrl, plantId, user.uid)
+            } else ""
+
+            val newPlant = Plant(
+                id = plantId,
+                name = name,
+                species = species,
+                wateringInterval = interval,
+                mistingInterval = mistingInterval,
+                fertilizingInterval = fertilizingInterval,
+                sunlightNeeds = sunlight,
+                imageUrl = permanentUrl,
+                userId = user.uid
+            )
+
+            try {
+                db.collection("plants").document(plantId).set(newPlant).await()
                 _plantState.value = PlantState.Success
-                fetchPlants() // refresh the list
-            }
-            .addOnFailureListener { e ->
+                fetchPlants()
+            } catch (e: Exception) {
                 _plantState.value = PlantState.Error(e.message ?: "Error adding plant")
             }
+        }
+    }
+
+    /**
+     * Downloads an image from a URL and uploads it to Firebase Storage.
+     * Returns the permanent download URL, or the original URL if upload fails.
+     */
+    private suspend fun uploadImageToStorage(
+        sourceUrl: String, 
+        plantId: String, 
+        userId: String
+    ): String {
+        return withContext(Dispatchers.IO) {
+            try {
+                // Download image bytes from API URL
+                val imageBytes = URL(sourceUrl).readBytes()
+                
+                // Upload to Firebase Storage
+                val storageRef = storage.reference
+                    .child("plant_images/$userId/$plantId.jpg")
+                storageRef.putBytes(imageBytes).await()
+                
+                // Get permanent download URL
+                storageRef.downloadUrl.await().toString()
+            } catch (e: Exception) {
+                // If upload fails, fall back to original URL
+                sourceUrl
+            }
+        }
     }
 
     fun updatePlant(
