@@ -1,4 +1,4 @@
-﻿package com.example.plantcare.ui.profile
+package com.example.plantcare.ui.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,6 +44,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.example.plantcare.ui.components.ToastMessage
 import com.example.plantcare.ui.components.ToastNotification
 import com.example.plantcare.ui.components.ToastType
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,7 +92,7 @@ fun ProfileScreen(
         }
     }
 
-    // Show toast based on authState
+    // Show toast based on authState — close modals FIRST, then show toast after delay
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.Success -> {
@@ -101,11 +102,15 @@ fun ProfileScreen(
                     "photo" -> "Profile photo updated successfully"
                     else -> "Changes saved successfully"
                 }
-                activeToast = ToastMessage(successMsg, ToastType.SUCCESS)
+                // Close modals first so toast Popup appears on top
                 showChangePasswordModal = false
                 showChangeEmailModal = false
+                showAccountSettingsModal = false
                 authViewModel.resetState()
                 pendingAction = ""
+                // Wait for modal dismiss animation to finish
+                delay(400)
+                activeToast = ToastMessage(successMsg, ToastType.SUCCESS)
             }
             is AuthState.Error -> {
                 val errorMsg = (authState as AuthState.Error).message
