@@ -927,14 +927,7 @@ fun AppearanceBottomSheet(onDismiss: () -> Unit) {
             
             Spacer(modifier = Modifier.height(32.dp))
         }
-    } // end Scaffold
-
-    // Toast overlay - shows success/error above bottom nav
-    ToastNotification(
-        toast = activeToast,
-        onDismiss = { activeToast = null }
-    )
-    } // end Box
+    }
 }
 
 @Composable
