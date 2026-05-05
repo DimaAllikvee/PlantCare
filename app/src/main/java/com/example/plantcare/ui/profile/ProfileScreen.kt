@@ -85,14 +85,7 @@ fun ProfileScreen(
         }
     }
 
-    // Reset auth state when modals close
-    LaunchedEffect(showChangePasswordModal, showChangeEmailModal) {
-        if (!showChangePasswordModal && !showChangeEmailModal) {
-            authViewModel.resetState()
-        }
-    }
-
-    // Show toast based on authState — close modals FIRST, then show toast after delay
+    // Show toast based on authState
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.Success -> {
@@ -102,15 +95,17 @@ fun ProfileScreen(
                     "photo" -> "Profile photo updated successfully"
                     else -> "Changes saved successfully"
                 }
-                // Close modals first so toast Popup appears on top
+                // Close modals first so toast appears on main screen
                 showChangePasswordModal = false
                 showChangeEmailModal = false
                 showAccountSettingsModal = false
-                authViewModel.resetState()
                 pendingAction = ""
-                // Wait for modal dismiss animation to finish
+                // Wait for modal dismiss animation, then show toast
                 delay(400)
                 activeToast = ToastMessage(successMsg, ToastType.SUCCESS)
+                // Reset AFTER toast is shown (this will re-trigger this effect with Idle, which is a no-op)
+                delay(100)
+                authViewModel.resetState()
             }
             is AuthState.Error -> {
                 val errorMsg = (authState as AuthState.Error).message
