@@ -1,6 +1,7 @@
 package com.example.plantcare.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -26,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.delay
 
 enum class ToastType { SUCCESS, ERROR }
@@ -35,34 +38,72 @@ data class ToastMessage(
     val type: ToastType
 )
 
+/**
+ * Renders a toast notification using Popup — appears above ALL windows,
+ * including modals, dialogs, and bottom sheets.
+ *
+ * Position: bottom-center, ~90dp above the bottom navigation bar.
+ * Auto-dismisses after 3 seconds.
+ */
 @Composable
 fun ToastNotification(
     toast: ToastMessage?,
     onDismiss: () -> Unit
 ) {
-    // Auto-dismiss after 3 seconds
+    var isVisible by remember { mutableStateOf(false) }
+
+    // Animate in immediately when toast appears; auto-dismiss after 3s
     LaunchedEffect(toast) {
         if (toast != null) {
+            isVisible = true
             delay(3000)
+            isVisible = false
+            delay(350) // wait for exit animation before clearing state
             onDismiss()
+        } else {
+            isVisible = false
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 96.dp, start = 16.dp, end = 16.dp),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        AnimatedVisibility(
-            visible = toast != null,
-            enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-            exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+    // Only create the Popup window when there is an active toast
+    if (toast != null) {
+        Popup(
+            alignment = Alignment.BottomCenter,
+            properties = PopupProperties(
+                focusable = false,           // don't steal focus from dialogs
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
         ) {
-            if (toast != null) {
-                when (toast.type) {
-                    ToastType.SUCCESS -> SuccessToast(message = toast.message, onDismiss = onDismiss)
-                    ToastType.ERROR -> ErrorToast(message = toast.message, onDismiss = onDismiss)
+            // Full-width container with bottom padding to sit above the bottom nav
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 90.dp), // above 80dp bottom nav + margin
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = tween(durationMillis = 350)
+                    ) + fadeIn(animationSpec = tween(250)),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeOut(animationSpec = tween(200))
+                ) {
+                    when (toast.type) {
+                        ToastType.SUCCESS -> SuccessToast(
+                            message = toast.message,
+                            onDismiss = { isVisible = false }
+                        )
+                        ToastType.ERROR -> ErrorToast(
+                            message = toast.message,
+                            onDismiss = { isVisible = false }
+                        )
+                    }
                 }
             }
         }
@@ -71,8 +112,7 @@ fun ToastNotification(
 
 @Composable
 private fun SuccessToast(message: String, onDismiss: () -> Unit) {
-    // Success: dark green background #0F5238, rounded icon with checkmark
-    val successBg = Color(0x0F, 0x52, 0x38)
+    val successBg = Color(0xFF0F5238)
 
     Row(
         modifier = Modifier
@@ -80,33 +120,29 @@ private fun SuccessToast(message: String, onDismiss: () -> Unit) {
             .shadow(
                 elevation = 8.dp,
                 shape = RoundedCornerShape(16.dp),
-                spotColor = successBg.copy(alpha = 0.2f)
+                spotColor = successBg.copy(alpha = 0.3f)
             )
             .clip(RoundedCornerShape(16.dp))
             .background(successBg)
-            .padding(horizontal = 16.dp, vertical = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Rounded icon bubble
+        // Checkmark icon circle
         Box(
             modifier = Modifier
-                .size(32.dp)
-                .background(
-                    color = Color(0x2D, 0x6A, 0x4F), // slightly lighter green
-                    shape = CircleShape
-                ),
+                .size(36.dp)
+                .background(Color(0xFF1A7A52), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Check,
                 contentDescription = "Success",
                 tint = Color.White,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
 
-        // Text
         Text(
             text = message,
             color = Color.White,
@@ -115,16 +151,15 @@ private fun SuccessToast(message: String, onDismiss: () -> Unit) {
             modifier = Modifier.weight(1f)
         )
 
-        // Close button
         IconButton(
             onClick = onDismiss,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(28.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Dismiss",
                 tint = Color.White.copy(alpha = 0.6f),
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(15.dp)
             )
         }
     }
@@ -132,9 +167,8 @@ private fun SuccessToast(message: String, onDismiss: () -> Unit) {
 
 @Composable
 private fun ErrorToast(message: String, onDismiss: () -> Unit) {
-    // Error: near-black background #191C1B, white border 5% opacity, red error icon
-    val errorBg = Color(0x19, 0x1C, 0x1B)
-    val errorIconColor = Color(0xFF, 0x8A, 0x80) // salmon/red
+    val errorBg = Color(0xFF191C1B)
+    val errorIconColor = Color(0xFFFF8A80)
 
     Row(
         modifier = Modifier
@@ -142,57 +176,48 @@ private fun ErrorToast(message: String, onDismiss: () -> Unit) {
             .shadow(
                 elevation = 12.dp,
                 shape = RoundedCornerShape(16.dp),
-                spotColor = Color.Black.copy(alpha = 0.3f)
+                spotColor = Color.Black.copy(alpha = 0.4f)
             )
             .clip(RoundedCornerShape(16.dp))
             .background(errorBg)
-            .border(
-                width = 1.dp,
-                color = Color.White.copy(alpha = 0.05f),
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(horizontal = 16.dp, vertical = 16.dp),
+            .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Error icon box - red tinted semi-transparent bg
+        // Error icon box
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .background(
-                    color = Color(0xBA, 0x1A, 0x1A, 0x33), // #BA1A1A at 20% alpha
-                    shape = RoundedCornerShape(12.dp)
-                ),
+                .background(Color(0xFFBA1A1A).copy(alpha = 0.2f), RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.ErrorOutline,
                 contentDescription = "Error",
                 tint = errorIconColor,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(22.dp)
             )
         }
 
-        // Text
         Text(
             text = message,
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            lineHeight = 17.5.sp,
+            lineHeight = 18.sp,
             modifier = Modifier.weight(1f)
         )
 
-        // Close button
         IconButton(
             onClick = onDismiss,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(28.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Dismiss",
                 tint = Color.White.copy(alpha = 0.4f),
-                modifier = Modifier.size(12.dp)
+                modifier = Modifier.size(14.dp)
             )
         }
     }
