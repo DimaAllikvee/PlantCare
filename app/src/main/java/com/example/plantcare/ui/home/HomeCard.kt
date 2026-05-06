@@ -5,6 +5,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -174,12 +176,15 @@ fun HomeCard(
         (fraction.coerceIn(0f, 1f) * 100).toInt()
     }
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .shadow(elevation = 20.dp, shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp))
             .clip(RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp))
             .background(androidx.compose.material3.MaterialTheme.colorScheme.surface)
+            .verticalScroll(scrollState)
             .padding(top = 39.dp, bottom = 24.dp, start = 24.dp, end = 24.dp)
     ) {
         // Plant Title and Last Watered
