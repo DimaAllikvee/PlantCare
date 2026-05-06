@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material.icons.outlined.WbSunny
@@ -58,10 +59,17 @@ fun CareCalendarScreen(
     val backgroundColor = MaterialTheme.colorScheme.background
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var taskToReschedule by remember { mutableStateOf<TaskCardInfo?>(null) }
+    var showGlobalDatePicker by remember { mutableStateOf(false) }
     
-    // Generate next 14 days for the selector
-    val dates = remember { 
-        (0..14).map { LocalDate.now().plusDays(it.toLong()) } 
+    // Generate next 14 days for the selector based on current selected date's week or just starting from today.
+    // If selectedDate is far in the future/past, the row might not show it if we keep it static.
+    // To make it better, we can generate a range of dates around the selectedDate.
+    val dates = remember(selectedDate) {
+        val today = LocalDate.now()
+        // If selectedDate is within today .. today+14, we can keep the row starting from today.
+        // Otherwise, start from selectedDate
+        val start = if (selectedDate >= today && selectedDate <= today.plusDays(14)) today else selectedDate
+        (0..14).map { start.plusDays(it.toLong()) } 
     }
     
     val plants by plantViewModel.plants.collectAsState()
@@ -156,6 +164,15 @@ fun CareCalendarScreen(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 24.sp
                     ) 
+                },
+                actions = {
+                    IconButton(onClick = { showGlobalDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select Date",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = backgroundColor)
             )
@@ -274,6 +291,33 @@ fun CareCalendarScreen(
                             )
                         }
                     }
+                }
+            }
+            
+            if (showGlobalDatePicker) {
+                val datePickerState = rememberDatePickerState(
+                    initialSelectedDateMillis = selectedDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
+                )
+                
+                DatePickerDialog(
+                    onDismissRequest = { showGlobalDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                selectedDate = Instant.ofEpochMilli(millis).atZone(ZoneId.of("UTC")).toLocalDate()
+                            }
+                            showGlobalDatePicker = false
+                        }) {
+                            Text("OK", color = PrimaryGreen)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showGlobalDatePicker = false }) {
+                            Text("Cancel", color = TextGray)
+                        }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
                 }
             }
             
