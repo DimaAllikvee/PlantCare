@@ -495,7 +495,7 @@ fun AccountSettingsModal(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text(text = "Save Changes", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
@@ -649,7 +649,7 @@ fun ChangePasswordModal(
                             .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
                             .size(36.dp)
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                     }
                 }
 
@@ -752,7 +752,7 @@ fun ChangePasswordModal(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                         enabled = authState !is AuthState.Loading
                     ) {
@@ -843,7 +843,7 @@ fun AppearanceBottomSheet(onDismiss: () -> Unit) {
                     onClick = onDismiss,
                     modifier = Modifier.size(40.dp)
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.Black) // Temporary close icon, Figma uses SVG
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = MaterialTheme.colorScheme.primary)
                 }
             }
             

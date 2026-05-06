@@ -62,7 +62,7 @@ fun ChangeEmailModal(
                     color = PrimaryGreen
                 )
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Filled.Close, contentDescription = "Close", tint = TextGray)
+                    Icon(Icons.Filled.Close, contentDescription = "Close", tint = PrimaryGreen)
                 }
             }
 
