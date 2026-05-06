@@ -85,7 +85,7 @@ fun MyPlantsScreen(
                     text = "My Plants",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = PrimaryGreen
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary
                 )
                 
                 IconButton(
@@ -93,9 +93,9 @@ fun MyPlantsScreen(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(PrimaryGreen)
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.primary)
                 ) {
-                    Icon(Icons.Filled.Add, contentDescription = "Add New Plant", tint = Color.White)
+                    Icon(Icons.Filled.Add, contentDescription = "Add New Plant", tint = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary)
                 }
             }
             
@@ -108,13 +108,13 @@ fun MyPlantsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                placeholder = { Text("Search plants...", color = TextGray) },
-                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search", tint = TextGray) },
+                placeholder = { Text("Search plants...", color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant) },
+                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search", tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = CardBackground,
-                    focusedContainerColor = CardBackground,
+                    unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                    focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedBorderColor = Color.Transparent,
-                    focusedBorderColor = PrimaryGreen,
+                    focusedBorderColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 ),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true
@@ -185,7 +185,7 @@ fun PlantListCard(
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
+        colors = CardDefaults.cardColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
@@ -203,7 +203,7 @@ fun PlantListCard(
                 modifier = Modifier
                     .size(116.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(SurfaceLightGreen)
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.surface)
             ) {
                 if (imageUrl.isNotEmpty()) {
                     coil.compose.AsyncImage(
@@ -238,7 +238,7 @@ fun PlantListCard(
                     text = name,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = PrimaryGreen,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                     maxLines = 2
                 )
                 
@@ -247,7 +247,7 @@ fun PlantListCard(
                 Text(
                     text = "Last watered:\n$lastWatered",
                     fontSize = 12.sp,
-                    color = TextGray
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             
