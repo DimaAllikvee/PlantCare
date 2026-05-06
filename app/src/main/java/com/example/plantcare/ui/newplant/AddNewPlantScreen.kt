@@ -92,7 +92,11 @@ fun AddNewPlantScreen(
                 details.wateringBenchmark?.value
             )
             wateringInterval = interval
-            val imgUrl = details.defaultImage?.regularUrl ?: details.defaultImage?.originalUrl
+            val imgUrl = details.defaultImage?.regularUrl 
+                ?: details.defaultImage?.mediumUrl 
+                ?: details.defaultImage?.originalUrl 
+                ?: details.defaultImage?.smallUrl 
+                ?: details.defaultImage?.thumbnail
             if (!imgUrl.isNullOrEmpty()) {
                 selectedImageUrl = imgUrl
             }
@@ -318,6 +322,9 @@ fun AddNewPlantScreen(
                                     // Thumbnail
                                     val thumbUrl = species.defaultImage?.thumbnail
                                         ?: species.defaultImage?.smallUrl
+                                        ?: species.defaultImage?.regularUrl
+                                        ?: species.defaultImage?.mediumUrl
+                                        ?: species.defaultImage?.originalUrl
                                     if (thumbUrl != null) {
                                         AsyncImage(
                                             model = thumbUrl,
