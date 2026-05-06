@@ -92,11 +92,11 @@ fun AddNewPlantScreen(
                 details.wateringBenchmark?.value
             )
             wateringInterval = interval
-            val imgUrl = details.defaultImage?.regularUrl 
+            val imgUrl = (details.defaultImage?.regularUrl 
                 ?: details.defaultImage?.mediumUrl 
                 ?: details.defaultImage?.originalUrl 
                 ?: details.defaultImage?.smallUrl 
-                ?: details.defaultImage?.thumbnail
+                ?: details.defaultImage?.thumbnail)?.takeIf { !it.contains("upgrade_access") }
             if (!imgUrl.isNullOrEmpty()) {
                 selectedImageUrl = imgUrl
             }
@@ -320,11 +320,11 @@ fun AddNewPlantScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     // Thumbnail
-                                    val thumbUrl = species.defaultImage?.thumbnail
+                                    val thumbUrl = (species.defaultImage?.thumbnail
                                         ?: species.defaultImage?.smallUrl
                                         ?: species.defaultImage?.regularUrl
                                         ?: species.defaultImage?.mediumUrl
-                                        ?: species.defaultImage?.originalUrl
+                                        ?: species.defaultImage?.originalUrl)?.takeIf { !it.contains("upgrade_access") }
                                     if (thumbUrl != null) {
                                         AsyncImage(
                                             model = thumbUrl,
