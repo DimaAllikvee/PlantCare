@@ -45,7 +45,7 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top Banner Image
@@ -66,7 +66,7 @@ fun LoginScreen(
             text = "Welcome Back",
             fontSize = 40.sp,
             fontWeight = FontWeight.Medium,
-            color = PrimaryGreen,
+            color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 40.dp)
         )
 
@@ -74,21 +74,21 @@ fun LoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            placeholder = { Text("Enter your email", color = TextGray) },
+            placeholder = { Text("Enter your email", color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Email,
                     contentDescription = "Email Icon",
-                    tint = TextGray
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             shape = RoundedCornerShape(23.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = SurfaceLightGreen,
-                unfocusedContainerColor = SurfaceLightGreen,
-                focusedBorderColor = TextGray,
-                unfocusedBorderColor = TextGray,
-                cursorColor = PrimaryGreen
+                focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                focusedBorderColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedBorderColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -102,18 +102,18 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            placeholder = { Text("Enter your password", color = TextGray) },
+            placeholder = { Text("Enter your password", color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = "Lock Icon",
-                    tint = TextGray
+                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             trailingIcon = {
                 Text(
                     text = if (passwordVisible) "Hide" else "Show",
-                    color = TextGray,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
                         .clickable { passwordVisible = !passwordVisible }
                         .padding(end = 16.dp)
@@ -122,11 +122,11 @@ fun LoginScreen(
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             shape = RoundedCornerShape(23.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = SurfaceLightGreen,
-                unfocusedContainerColor = SurfaceLightGreen,
-                focusedBorderColor = TextGray,
-                unfocusedBorderColor = TextGray,
-                cursorColor = PrimaryGreen
+                focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                focusedBorderColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedBorderColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -145,7 +145,7 @@ fun LoginScreen(
                 text = "Forgot Password?",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = PrimaryGreen,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier.clickable { /* Handle click */ }
             )
@@ -206,13 +206,13 @@ fun LoginScreen(
                 text = "Don't have an account? ",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
-                color = TextGray
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = "Sign Up",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
-                color = PrimaryGreen,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable { onSignUpClick() }
             )
         }
