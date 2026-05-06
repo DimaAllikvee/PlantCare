@@ -33,6 +33,17 @@ class PlantViewModel : ViewModel() {
     private val _plants = MutableStateFlow<List<Plant>>(emptyList())
     val plants: StateFlow<List<Plant>> = _plants.asStateFlow()
 
+    private val _toastMessage = MutableStateFlow<com.example.plantcare.ui.components.ToastMessage?>(null)
+    val toastMessage: StateFlow<com.example.plantcare.ui.components.ToastMessage?> = _toastMessage.asStateFlow()
+
+    fun showToast(message: String, type: com.example.plantcare.ui.components.ToastType = com.example.plantcare.ui.components.ToastType.SUCCESS) {
+        _toastMessage.value = com.example.plantcare.ui.components.ToastMessage(message, type)
+    }
+
+    fun clearToast() {
+        _toastMessage.value = null
+    }
+
     init {
         fetchPlants()
     }
@@ -83,9 +94,11 @@ class PlantViewModel : ViewModel() {
             try {
                 db.collection("plants").document(plantId).set(newPlant).await()
                 _plantState.value = PlantState.Success
+                showToast("Plant added successfully")
                 fetchPlants()
             } catch (e: Exception) {
                 _plantState.value = PlantState.Error(e.message ?: "Error adding plant")
+                showToast(e.message ?: "Error adding plant", com.example.plantcare.ui.components.ToastType.ERROR)
             }
         }
     }
@@ -168,10 +181,12 @@ class PlantViewModel : ViewModel() {
             .delete()
             .addOnSuccessListener {
                 _plantState.value = PlantState.Success
+                showToast("Plant deleted")
                 fetchPlants() // refresh the list
             }
             .addOnFailureListener { e ->
                 _plantState.value = PlantState.Error(e.message ?: "Error deleting plant")
+                showToast(e.message ?: "Error deleting plant", com.example.plantcare.ui.components.ToastType.ERROR)
             }
     }
 
@@ -183,10 +198,12 @@ class PlantViewModel : ViewModel() {
         db.collection("plants").document(plantId)
             .update(updates)
             .addOnSuccessListener {
+                showToast("Watering updated")
                 fetchPlants() // refresh the list to reflect updated moisture
             }
             .addOnFailureListener { e ->
                 _plantState.value = PlantState.Error(e.message ?: "Error updating plant")
+                showToast(e.message ?: "Error updating plant", com.example.plantcare.ui.components.ToastType.ERROR)
             }
     }
 
