@@ -306,8 +306,8 @@ fun ProfileScreen(
                 SettingsItem(
                     title = "Log Out",
                     icon = Icons.Outlined.ExitToApp,
-                    contentColor = Color(0xFFBA1A1A),
-                    iconBackgroundColor = Color(0xFFFFDAD6).copy(alpha = 0.3f),
+                    contentColor = MaterialTheme.colorScheme.error,
+                    iconBackgroundColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
                     hasArrow = false,
                     onClick = onLogout
                 )
@@ -342,16 +342,19 @@ fun StatCard(modifier: Modifier = Modifier, count: String, label: String, backgr
 fun SettingsItem(
     title: String,
     icon: ImageVector,
-    contentColor: Color = Color(0xFF0F5238),
-    iconBackgroundColor: Color = Color(0xFFDDE4DC).copy(alpha = 0.5f),
+    contentColor: Color = Color.Unspecified,
+    iconBackgroundColor: Color = Color.Unspecified,
     hasArrow: Boolean = true,
     onClick: () -> Unit = {}
 ) {
+    val finalContentColor = if (contentColor == Color.Unspecified) MaterialTheme.colorScheme.onSurface else contentColor
+    val finalIconBg = if (iconBackgroundColor == Color.Unspecified) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else iconBackgroundColor
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -359,16 +362,16 @@ fun SettingsItem(
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .background(iconBackgroundColor, RoundedCornerShape(12.dp)),
+                .background(finalIconBg, RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(20.dp))
+            Icon(imageVector = icon, contentDescription = null, tint = finalContentColor, modifier = Modifier.size(20.dp))
         }
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = title, color = contentColor, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+        Text(text = title, color = finalContentColor, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
         
         if (hasArrow) {
-            Icon(imageVector = Icons.Default.ChevronRight, contentDescription = null, tint = Color.LightGray)
+            Icon(imageVector = Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
         }
     }
 }
@@ -384,27 +387,27 @@ fun SettingsItemWithToggle(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .background(Color(0xFFDDE4DC).copy(alpha = 0.5f), RoundedCornerShape(12.dp)),
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = Color(0xFF0F5238), modifier = Modifier.size(20.dp))
+            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
         }
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = title, color = Color(0xFF0F5238), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+        Text(text = title, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
         
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = Color(0xFF2D6A4F)
+                checkedThumbColor = MaterialTheme.colorScheme.surface,
+                checkedTrackColor = MaterialTheme.colorScheme.primary
             )
         )
     }
