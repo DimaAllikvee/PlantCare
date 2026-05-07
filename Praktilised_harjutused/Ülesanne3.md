@@ -1,9 +1,9 @@
-# Ülesanne 3 — Toidu tellimise äpi nõuded
+# Ülesanne 3  Toidu tellimise äpi nõuded
 
 Kliendi soov: "Tahan rakendust kus saab toitu tellida. Peab olema lihtne ja kiire."
 
 ## 1. Mis on selle kirjeldusega valesti?
-1.  **Liiga ebatäpne:** Sõna "lihtne" on subjektne – see, mis on lihtne ühele, ei pruugi olla teisele.
+1.  **Liiga ebatäpne:** Sõna "lihtne" on subjektne see, mis on lihtne ühele, ei pruugi olla teisele.
 2.  **Mittemõõdetav:** Sõna "kiire" ei ütle, mitu sekundit äpp laadida tohib. Seda ei saa testida.
 3.  **Puudulik info:** Kirjeldus ei maini olulisi asju nagu menüü, maksmine või kohaletoimetamine.
 
