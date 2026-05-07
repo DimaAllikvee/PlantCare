@@ -15,5 +15,5 @@ Kliendi soov: "Tahan rakendust kus saab toitu tellida. Peab olema lihtne ja kiir
 
 ## 3. Mittefunktsionaalsed nõuded (Kuidas äpp töötab?)
 1.  **Kiirus:** Rakenduse iga leht peab laadima vähem kui **3 sekundi** jooksul.
-2.  **Töökindlus:** Süsteem peab olema kättesaadav **99.9%** ajast aastas.
+2.  **Mobiilsus:**  Rakenduse installeerimisfaili (APK) suurus ei tohi ületada 50 MB. (Nii mahub äpp ka vanematesse telefonidesse).
 3.  **Kasutajate arv:** Rakendus peab suutma teenindada vähemalt **1000 kasutajat** üheaegselt ilma aeglustumiseta.
