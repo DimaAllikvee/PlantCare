@@ -11,12 +11,16 @@ Monoliitse arhitektuuri puhul on kogu rakenduse kood (kasutajate haldus, tooted,
 ## 3. Skeem (Maxima mikroteenustena)
 Mikroteenustena jagatakse süsteem väiksemateks iseseisvateks mooduliteks.
 
+```text
 [Kasutajaliides (Mobiiliäpp / Veeb)]
-      |
-[API Gateway] -- (suunab päringud õigesse kohta)
-      |
+                 |
+                 v
+           [API Gateway] 
+                 |
   -----------------------------------------
   |                  |                    |
-[Kasutajate API]  [Toodete API]      [Maksete API] 
+  v                  v                    v
+[Kasutajad]      [Tooted]            [Maksed] 
   |                  |                    |
-(Andmebaas 1)     (Andmebaas 2)      (Andmebaas 3)
+  v                  v                    v
+(DB 1)             (DB 2)               (DB 3)
