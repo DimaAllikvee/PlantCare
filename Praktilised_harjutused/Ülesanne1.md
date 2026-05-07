@@ -21,5 +21,3 @@
     *   Kasutajana tahan näha tunniplaani, et leida endale sobiv trenn ja kellaaeg.
 2.  **Broneerimine:**
     *   Kasutajana tahan broneerida koha trennis, et ma ei peaks muretsema, kas saalis on vaba kohta.
-
----
