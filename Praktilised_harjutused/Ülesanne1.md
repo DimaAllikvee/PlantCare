@@ -1,7 +1,7 @@
 # Ülesanne 1
 
 ## 1. Milline metoodika on parim?
-**Valik:** Scrum (paindlik arendus).
+**Valik:** Scrum (paindlik arendus)
 
 **Miks see on hea?**
 *   **Klient ei tea täpselt, mida ta tahab:** Scrum võimaldab meil teha tööd väikeste sammudega. Saame iga kahe nädala tagant kliendile midagi näidata.
@@ -12,7 +12,7 @@
 
 **Mis juhtuks 2. kuul?**
 *   Kui klient muudab meelt teisel kuul, on meil tõenäoliselt pool tööd juba valesti tehtud.
-*   Me peaksime hakkama uuesti nullist pihta.
+*   Me peame otsast peale hakkama.
 *   See raiskab aega ja raha ning me ei jõua 4 kuuga valmis.
 
 ## 3. Kasutajalood (User Stories)
