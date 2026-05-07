@@ -1,6 +1,4 @@
-# Ülesanne 1 — Metoodika valik
-
-See dokument selgitab, kuidas me valisime õige tööviisi spordiklubi rakenduse jaoks.
+# Ülesanne 1
 
 ## 1. Milline metoodika on parim?
 **Valik:** Scrum (paindlik arendus).
